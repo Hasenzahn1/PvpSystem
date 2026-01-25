@@ -9,9 +9,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public class DatabaseManager {
@@ -81,7 +79,7 @@ public class DatabaseManager {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Error saving the entries!");
+            System.err.println("Fehler beim Batch-Speichern der Damage-Einträge!");
         }
     }
 
@@ -95,37 +93,5 @@ public class DatabaseManager {
 
     public HashMap<UUID, PlayerStateEntry> getPlayerStates(){
         return playerStates;
-    }
-
-    /**
-     * Get all death entries for a player, ordered by timestamp (most recent first)
-     */
-    public List<PlayerDeathEntry> getDeathsForPlayer(UUID uuid) {
-        try {
-            List<PlayerDeathEntry> deaths = playerDeathDao.queryBuilder()
-                    .orderBy("timestamp", false)
-                    .where()
-                    .eq("uuid", uuid)
-                    .query();
-            return deaths != null ? deaths : Collections.emptyList();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Get a specific death entry by its ID
-     */
-    public PlayerDeathEntry getDeathById(int id) {
-        try {
-            return playerDeathDao.queryBuilder()
-                    .where()
-                    .eq("id", id)
-                    .queryForFirst();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }
