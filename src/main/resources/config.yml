@@ -1,0 +1,48 @@
+prefix: "&7[&3Pvp&1System&7]: &f"
+
+joinMessageDuration: 100
+
+damageThreshold: 6
+damageBelowThreshold: 1
+lastDamageDuration: 2000
+
+
+
+lang:
+  commands:
+    noPermission: "&cYou don't have permission to use this command"
+    noPlayer: "&cYou have to be a player to use this command"
+    invalidCommand: "&cPlease use &6%command%"
+
+    peaceful:
+      setOn: "&7You successfully &aenabled &7the peaceful mode for yourself"
+      setOff: "&7You successfully &cdisabled &7the peaceful mode for yourself"
+      setOnOther: "&7You successfully &aenabled &7the peaceful mode for &6%player%"
+      setOffOther: "&7You successfully &cdisabled &7the peaceful mode for &6%player%"
+
+  join:
+    message:
+      peaceful: "&7Joined with mode: &aPeaceful"
+      notPeaceful: "&6Joined with mode: &aNot Peaceful"
+
+  # Possible placeholders for all messages. %attacker%, %defender%
+  damage:
+    message:
+      attacker:
+        isPeaceful: "You are in Peaceful mode. Do not attack other players!"
+        isNotPeaceful: "Your opponent in in peaceful mode. Killing him may result in further punishment"
+
+      defender:
+        isPeaceful: "Peaceful mode protection: %attacker% is attacking you"
+        isNotPeaceful: "You are protected as the other player is in peaceful mode."
+
+  # Possible placeholders for all messages. %attacker%, %defender%
+  death:
+    message:
+      attacker:
+        isPeaceful: "You killed another player whilst being in peaceful mode. This can result in further punishment!"
+        isNotPeaceful: "You kills a player in peaceful mode. This can result in further punishment!"
+
+      defender:
+        isPeaceful: "You were killed while being in peaceful mode. If this is not fine with you report %attacker% for killing"
+        isNotPeaceful: "You were killed by a player in peaceful mode. You can still report that player %attacker%"

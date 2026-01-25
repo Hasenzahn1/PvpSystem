@@ -1,0 +1,10 @@
+name: PvpSystem
+version: '1.0-SNAPSHOT'
+main: me.hasenzahn1.pvp.PvpSystem
+api-version: '1.21'
+
+commands:
+  peaceful:
+    description: "Command to make a player peaceful"
+    usage: "/peaceful (player) <on/off>"
+    aliases: ["friedlich"]
