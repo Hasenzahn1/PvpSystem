@@ -21,18 +21,9 @@ public class EventUtils {
         Player player = ((Player) damageEvent.getEntity());
 
         // Check player
-        Player damager = getCausingPlayerFromEvent(damageEvent);
-        if(damager != null) return damager.getUniqueId().toString();
-
-        //Check entities
-        if (damageEvent instanceof EntityDamageByEntityEvent) {
-            EntityDamageByEntityEvent entityEvent = (EntityDamageByEntityEvent) damageEvent;
-            Entity damagingEntity = entityEvent.getDamager();
-
-            if (damagingEntity instanceof EnderCrystal) {
-                return "#end_crystal";
-            }
-        }
+        DamageSource source = damageEvent.getDamageSource();
+        if(source.getCausingEntity() instanceof Player) return source.getCausingEntity().getUniqueId().toString();
+        if(source.getCausingEntity() != null) return "#" + source.getCausingEntity().getType().name().toLowerCase();
 
         // no player involved return damage cause
         EntityDamageEvent.DamageCause cause = damageEvent.getCause();
@@ -41,7 +32,6 @@ public class EventUtils {
             case LAVA -> "#lava";
             case FIRE, FIRE_TICK -> "#fire";
             case BLOCK_EXPLOSION, ENTITY_EXPLOSION -> {
-                // Wenn wir hier ankommen, war es kein Spieler
                 if (damageEvent instanceof EntityDamageByEntityEvent) {
                     Entity damagingEntity = ((EntityDamageByEntityEvent) damageEvent).getDamager();
                     if (damagingEntity instanceof TNTPrimed) {

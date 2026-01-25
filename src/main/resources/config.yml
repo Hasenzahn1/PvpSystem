@@ -5,7 +5,7 @@ joinMessageDuration: 100
 damageThreshold: 6
 damageBelowThreshold: 1
 lastDamageDuration: 2000
-
+peacefulCommandCooldownAfterPvp: 60000
 
 
 lang:
@@ -15,15 +15,65 @@ lang:
     invalidCommand: "&cPlease use &6%command%"
 
     peaceful:
+      cooldown: "&7You can't use this command currently as you engaged in pvp in the last 60 seconds."
       setOn: "&7You successfully &aenabled &7the peaceful mode for yourself"
       setOff: "&7You successfully &cdisabled &7the peaceful mode for yourself"
       setOnOther: "&7You successfully &aenabled &7the peaceful mode for &6%player%"
       setOffOther: "&7You successfully &cdisabled &7the peaceful mode for &6%player%"
 
-  join:
-    message:
-      peaceful: "&7Joined with mode: &aPeaceful"
-      notPeaceful: "&6Joined with mode: &aNot Peaceful"
+    deathhistory:
+      noDeaths: "&7No deaths found for &e%player%"
+      playerNotFound: "&cPlayer &6%player% &cnot found"
+
+      ui:
+        header: "&8====== &6Death History &7- &e%player% &8======"
+
+        entry:
+          line: "%days%  %mode%  %source%  %levels% %tp%%view%%reset%"
+
+          days: "&7%time%/d ago"
+          daysHover: "%timestamp%"
+
+          mode: "%defenderMode%v%attackerMode%"
+          modeHover: "%defenderModeLong% vs %attackerModeLong%"
+
+          source: "&8%attacker%"
+          sourceHover: "%attacker% using %cause%"
+
+          levels: "(%levels%lvl)"
+          levelsHover: "%levels%level %xp%exp"
+
+        buttons:
+          teleport: "&a[TP]  "
+          teleportHover: "&7Click to teleport to\n&f%world% (%x%, %y%, %z%)"
+          view: "&b[View]  "
+          viewHover: "&7Click to view inventory"
+          reset: "&c[Reset]  "
+          resetHover: "&7Click to restore inventory and XP"
+
+        pagination:
+          format: "&7Page &f%page%&7/&f%maxPage% &8◀ &7(%pages%&7) &8▶"
+          pageNumber: "&f%page%"
+          pageNumberCurrent: "&e&n%page%"
+          pageSeparator: " &8| "
+          pageHover: "&7Click to go to page %page%"
+          previousPage: "&7[◀ Previous]"
+          nextPage: "&7[Next ▶]"
+
+        actions:
+          teleported: "&aYou have been teleported to the death location"
+          teleportWorldNotFound: "&cWorld &6%world% &cno longer exists"
+          resetSuccess: "&aInventory and XP have been restored to &e%player%"
+          resetPlayerOffline: "&cPlayer &6%player% &cmust be online to restore inventory"
+          viewTitle: "&8Death Inventory - %player%"
+
+        modes:
+          peaceful: "&aP"
+          pvp: "&cV"
+          unknown: "&7U"
+          peacefulLong: "&aPeaceful"
+          pvpLong: "&cViolent"
+          unknownLong: "&7No Player"
 
   # Possible placeholders for all messages. %attacker%, %defender%
   damage:
@@ -46,3 +96,8 @@ lang:
       defender:
         isPeaceful: "You were killed while being in peaceful mode. If this is not fine with you report %attacker% for killing"
         isNotPeaceful: "You were killed by a player in peaceful mode. You can still report that player %attacker%"
+
+  join:
+    message:
+      peaceful: "&7Joined with mode: &aPeaceful"
+      notPeaceful: "&6Joined with mode: &aNot Peaceful"

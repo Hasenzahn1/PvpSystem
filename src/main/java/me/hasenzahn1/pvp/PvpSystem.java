@@ -1,5 +1,6 @@
 package me.hasenzahn1.pvp;
 
+import me.hasenzahn1.pvp.commands.DeathHistoryCommand;
 import me.hasenzahn1.pvp.commands.PeacefulCommand;
 import me.hasenzahn1.pvp.database.DatabaseManager;
 import me.hasenzahn1.pvp.listeners.ConnectionListener;
@@ -38,6 +39,10 @@ public final class PvpSystem extends JavaPlugin {
 
         getCommand("peaceful").setExecutor(new PeacefulCommand());
         getCommand("peaceful").setTabCompleter(new PeacefulCommand());
+
+        DeathHistoryCommand deathHistoryCommand = new DeathHistoryCommand();
+        getCommand("deathhistory").setExecutor(deathHistoryCommand);
+        getCommand("deathhistory").setTabCompleter(deathHistoryCommand);
 
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);

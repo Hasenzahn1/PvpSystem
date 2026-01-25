@@ -13,10 +13,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class PeacefulCommand implements CommandExecutor, TabCompleter {
+
+    public static HashMap<UUID, Long> PVP_ACTION_TIMESTAMPS = new HashMap<>();
+
+    private final int peacefulCommandCooldownAfterPvp;
+
+    public PeacefulCommand() {
+        peacefulCommandCooldownAfterPvp = PvpSystem.getInstance().getConfig().getInt("peacefulCommandCooldownAfterPvp");
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NonNull @NotNull String[] args) {
@@ -72,13 +82,15 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
 
     private void handleToggle(Player player){
         PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(player.getUniqueId());
-        state.state = !state.state;
-
-        if (state.state) player.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOn")));
-        else player.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOff")));
+        handleSet(player, player, !state.state);
     }
 
     private void handleSet(Player executor, Player player, boolean newState){
+        System.out.println(System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(executor.getUniqueId(), 0L));
+        if(player == executor && (System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(executor.getUniqueId(), 0L) < peacefulCommandCooldownAfterPvp)) {
+            executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.cooldown")));
+            return;
+        }
         PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(player.getUniqueId());
         state.state = newState;
 

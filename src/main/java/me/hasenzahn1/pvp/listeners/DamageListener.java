@@ -1,14 +1,13 @@
 package me.hasenzahn1.pvp.listeners;
 
 import me.hasenzahn1.pvp.PvpSystem;
+import me.hasenzahn1.pvp.commands.PeacefulCommand;
 import me.hasenzahn1.pvp.database.PlayerDamageEntry;
 import me.hasenzahn1.pvp.database.PlayerDeathEntry;
 import me.hasenzahn1.pvp.database.PlayerStateEntry;
 import me.hasenzahn1.pvp.utils.EventUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,7 +36,7 @@ public class DamageListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDamage(EntityDamageEvent event) {
         if(!(event.getEntity() instanceof Player)) return;
-        double damage = event.getDamage();
+        double damage = event.getFinalDamage();
         if(event.getCause() == EntityDamageEvent.DamageCause.FALL){
             if(System.currentTimeMillis() - timeAtLastDeath.getOrDefault(event.getEntity().getUniqueId(), 0L) >= lastDamageDuration) return;
             EntityDamageEvent evt = event.getEntity().getLastDamageCause();
@@ -65,6 +64,8 @@ public class DamageListener implements Listener {
         Player attacker = EventUtils.getCausingPlayerFromEvent(toCheck);
         if(attacker == null) return;
 
+        PeacefulCommand.PVP_ACTION_TIMESTAMPS.put(attacker.getUniqueId(), System.currentTimeMillis());
+
         handleDamage(event, attacker, ((Player) event.getEntity()));
     }
 
@@ -80,13 +81,16 @@ public class DamageListener implements Listener {
         if(!attackerState.state && !defenderState.state) return;
 
         //Above Damage threshold
+        double finalDamage = event.getFinalDamage();
+        event.setDamage(EntityDamageEvent.DamageModifier.ARMOR, 0);
         if(defender.getHealth() > damageThreshold) {
-            event.setDamage(Math.min(event.getDamage(), defender.getHealth() - damageThreshold));
+            event.setDamage(EntityDamageEvent.DamageModifier.BASE, Math.min(finalDamage, defender.getHealth() - damageThreshold));
             return;
         }
 
         //Below Damage Threshold
-        event.setDamage(Math.min(damageBelowThreshold, event.getDamage()));
+        event.setDamage(EntityDamageEvent.DamageModifier.BASE, Math.min(damageBelowThreshold, finalDamage));
+
 
         //Send Message
         //Send for attacker
@@ -99,6 +103,8 @@ public class DamageListener implements Listener {
     }
 
     private void handleDeath(Player attacker, Player defender) {
+        PeacefulCommand.PVP_ACTION_TIMESTAMPS.remove(defender.getUniqueId());
+
         PlayerStateEntry attackerState = PvpSystem.getInstance().getDatabase().getPlayerStates().get(attacker.getUniqueId());
         PlayerStateEntry defenderState = PvpSystem.getInstance().getDatabase().getPlayerStates().get(defender.getUniqueId());
 
