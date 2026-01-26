@@ -20,6 +20,50 @@ lang:
       setOnOther: "&7You successfully &aenabled &7the peaceful mode for &6%player%"
       setOffOther: "&7You successfully &cdisabled &7the peaceful mode for &6%player%"
 
+    lookup:
+      filterError: "&cInvalid filter: &7%filter%"
+
+      ui:
+        header: "&7===== &aLookup Result (%entries% Entries) &7====="
+
+        entry:
+          deathLine: "%timestamp% %defender%&7 &4slain by %attacker%&7 %pos% %info%"
+          damageLine: "%timestamp% %defender%&7 &rdamaged by %attacker%&7 %pos% %info%"
+
+          timestamp: "&7[dd.MM hh:mm]"
+          pos: "&e[Pos]"
+          posHover: "Teleport to location\n&7%world%, (%x%, %y%, %z%)"
+          info: "&9[Info]"
+          damageInfoHover: "&eDamage Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%&7(&a%defenderHealth%&7)\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Damage Done: &c%damage%\n&7Original Damage: &c%originalDamage%\n\n&7Click for more actions"
+          deathInfoHover: "&eDeath Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Levels Lost: &a%levels%\n&7Items in Inv: &e%itemsInInv%\n\n&7Click for more actions"
+          teleportSuccess: "Successfully teleported, Click here to get back to survival mode."
+          teleportHover: "Click here to get back to survival"
+
+          mode:
+            peaceful: "&a"
+            violent: "&c"
+            non: "&7"
+
+        page:
+          template: "&7Page: &r%current%&7/&r%max% %prev%&7(%pages%&7) %next%"
+          prev: "&8◀ "
+          next: "&8▶"
+          selectedPage: "&e&l&n%page%"
+          otherPage: "&r%page%"
+          separator: " &8| "
+
+        info:
+          damageInfo: "&7 ======= &eDamage Information &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause% &7did &c%originalDamage% &7reduced to &c%originalDamage%"
+          deathInfo: "&7 ======= &eDeath Information: &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause%\n&7Levels Lost: &a%levels%   &7Items in Inv: &e%itemsInInv%"
+          viewButton: "&a[View] "
+          viewHover: "Click to view the Inventory"
+          resetButton: "&c[Reset]"
+          resetHover: "Click to reset the Inventory\n&4This will replace the current Inventory"
+
+        inventoryTitle: "&7Death Inventory - &e%player%"
+        playerNotOnline: "&cThe player has to be only to reset the inventory"
+
+
   join:
     message:
       peaceful: "&7Joined with mode: &aPeaceful"

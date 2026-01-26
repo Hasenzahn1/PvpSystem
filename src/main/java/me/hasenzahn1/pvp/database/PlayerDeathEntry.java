@@ -5,6 +5,8 @@ import com.j256.ormlite.table.DatabaseTable;
 import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.utils.EventUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -65,6 +67,9 @@ public class PlayerDeathEntry {
     @DatabaseField
     private int attackerMode;
 
+    @DatabaseField
+    private double attackerHealth;
+
     public PlayerDeathEntry() {}
 
     public PlayerDeathEntry(PlayerDeathEvent event){
@@ -81,6 +86,9 @@ public class PlayerDeathEntry {
         this.offhandBase64 = Serializer.itemStackArrayToBase64(new ItemStack[] {event.getPlayer().getInventory().getItemInOffHand()});
         this.cause = event.getEntity().getLastDamageCause() != null ? event.getEntity().getLastDamageCause().getCause() : EntityDamageEvent.DamageCause.CUSTOM;
         this.timestamp = System.currentTimeMillis();
+
+        Entity attackingEntity = EventUtils.getCausingEntityFromEvent(event.getPlayer().getLastDamageCause());
+        this.attackerHealth = (attackingEntity instanceof LivingEntity) ? ((LivingEntity) attackingEntity).getHealth() : -1;
 
         //Load Defendermode
         PlayerStateEntry defenderState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(event.getEntity().getUniqueId(), null);
@@ -118,5 +126,69 @@ public class PlayerDeathEntry {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getWorld() {
+        return world;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public int getLevels() {
+        return levels;
+    }
+
+    public float getXp() {
+        return xp;
+    }
+
+    public String getAttackerString() {
+        return attacker;
+    }
+
+    public String getInventoryContentsBase64() {
+        return inventoryContentsBase64;
+    }
+
+    public String getArmorContentsBase64() {
+        return armorContentsBase64;
+    }
+
+    public String getOffhandBase64() {
+        return offhandBase64;
+    }
+
+    public EntityDamageEvent.DamageCause getCause() {
+        return cause;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public int getDefenderMode() {
+        return defenderMode;
+    }
+
+    public int getAttackerMode() {
+        return attackerMode;
+    }
+
+    public double getAttackerHealth() {
+        return attackerHealth;
     }
 }

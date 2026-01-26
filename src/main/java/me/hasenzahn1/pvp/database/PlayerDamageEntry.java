@@ -5,6 +5,8 @@ import com.j256.ormlite.table.DatabaseTable;
 import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.utils.EventUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
@@ -52,6 +54,12 @@ public class PlayerDamageEntry {
     @DatabaseField
     private int attackerMode;
 
+    @DatabaseField
+    private double attackerHealth;
+
+    @DatabaseField
+    private double defenderHealth;
+
     public PlayerDamageEntry() {}
 
     public PlayerDamageEntry(EntityDamageEvent event, double originalDamage) {
@@ -65,6 +73,7 @@ public class PlayerDamageEntry {
         this.attacker = EventUtils.getStringCauseFromEvent(event);
         this.cause = event.getCause();
         this.timestamp = System.currentTimeMillis();
+        this.defenderHealth = (event.getEntity() instanceof LivingEntity) ? ((LivingEntity) event.getEntity()).getHealth() : -1;
 
         //Load Defendermode
         PlayerStateEntry defenderState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(event.getEntity().getUniqueId(), null);
@@ -72,23 +81,78 @@ public class PlayerDamageEntry {
         else this.defenderMode = defenderState.state ? 1 : 0;
 
         //Load Attackemode
-        Player attackingPlayer = getAttacker();
-        if(attackingPlayer == null) this.attackerMode = -1;
+        Entity attackingEntity = EventUtils.getCausingEntityFromEvent(event);
+        this.attackerHealth = (attackingEntity instanceof LivingEntity) ? ((LivingEntity) attackingEntity).getHealth() : -1;
+        if(!(attackingEntity instanceof Player)) this.attackerMode = -1;
         else {
-            PlayerStateEntry attackerState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(attackingPlayer.getUniqueId(), null);
+            PlayerStateEntry attackerState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(attackingEntity.getUniqueId(), null);
             if(attackerState == null) this.attackerMode = -1;
             else this.attackerMode = attackerState.state ? 1 : 0;
         }
     }
 
-    private Player getAttacker(){
-        if(this.attacker.startsWith("#")) return null;
-        return Bukkit.getPlayer(UUID.fromString(this.attacker));
-    }
-
-
-
     public void create(){
         PvpSystem.getInstance().getDatabase().addDamageEntry(this);
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getWorld() {
+        return world;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public String getAttackerString() {
+        return attacker;
+    }
+
+    public double getOriginalDamage() {
+        return originalDamage;
+    }
+
+    public double getDamage() {
+        return damage;
+    }
+
+    public EntityDamageEvent.DamageCause getCause() {
+        return cause;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public int getDefenderMode() {
+        return defenderMode;
+    }
+
+    public int getAttackerMode() {
+        return attackerMode;
+    }
+
+    public double getAttackerHealth() {
+        return attackerHealth;
+    }
+
+    public double getDefenderHealth() {
+        return defenderHealth;
     }
 }

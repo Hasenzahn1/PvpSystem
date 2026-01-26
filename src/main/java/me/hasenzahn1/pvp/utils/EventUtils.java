@@ -15,6 +15,13 @@ public class EventUtils {
         return null;
     }
 
+    public static Entity getCausingEntityFromEvent(EntityDamageEvent event) {
+        if(event == null) return null;
+        DamageSource source = event.getDamageSource();
+        if(source.getCausingEntity() == null) return null;
+        return source.getCausingEntity();
+    }
+
     public static String getStringCauseFromEvent(EntityDamageEvent damageEvent) {
         if(damageEvent == null) return "#unknown";
         if(!(damageEvent.getEntity() instanceof Player)) return "#unknown";

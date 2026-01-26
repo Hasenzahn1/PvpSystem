@@ -1,6 +1,10 @@
 package me.hasenzahn1.pvp;
 
+import me.hasenzahn1.pvp.commands.DeathHistoryCommand;
+import me.hasenzahn1.pvp.commands.LookupCommand;
 import me.hasenzahn1.pvp.commands.PeacefulCommand;
+import me.hasenzahn1.pvp.commands.lookup.LookupEntry;
+import me.hasenzahn1.pvp.commands.lookup.PlayerSearchResult;
 import me.hasenzahn1.pvp.database.DatabaseManager;
 import me.hasenzahn1.pvp.listeners.ConnectionListener;
 import me.hasenzahn1.pvp.listeners.DamageListener;
@@ -9,6 +13,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public final class PvpSystem extends JavaPlugin {
 
@@ -17,6 +24,8 @@ public final class PvpSystem extends JavaPlugin {
     private static final boolean DEV_MODE = true;
 
     private DatabaseManager databaseManager;
+
+    private HashMap<UUID, PlayerSearchResult> playerSearchResults = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -39,6 +48,12 @@ public final class PvpSystem extends JavaPlugin {
         getCommand("peaceful").setExecutor(new PeacefulCommand());
         getCommand("peaceful").setTabCompleter(new PeacefulCommand());
 
+        getCommand("deathhistory").setExecutor(new DeathHistoryCommand());
+        getCommand("deathhistory").setTabCompleter(new DeathHistoryCommand());
+
+        getCommand("pvplookup").setExecutor(new LookupCommand());
+        getCommand("pvplookup").setTabCompleter(new LookupCommand());
+
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
     }
@@ -56,15 +71,19 @@ public final class PvpSystem extends JavaPlugin {
         return instance;
     }
 
-    public static String getLang(String key, String... args) {
+    public static String getLang(String key, Object... args) {
         String lang = PvpSystem.getInstance().getConfig().getString("lang." + key, "&cUnknown language key &6" + key);
         for (int i = 0; i + 1 < args.length; i += 2) {
-            lang = lang.replace("%" + args[i] + "%", args[i + 1]);
+            lang = lang.replace("%" + args[i].toString() + "%", args[i + 1].toString());
         }
         return ChatColor.translateAlternateColorCodes('&', lang);
     }
 
-    public static String getPrefixedLang(String key, String... args) {
+    public static String getPrefixedLang(String key, Object... args) {
         return PREFIX + getLang(key, args);
+    }
+
+    public HashMap<UUID, PlayerSearchResult> getPlayerSearchResults() {
+        return playerSearchResults;
     }
 }
