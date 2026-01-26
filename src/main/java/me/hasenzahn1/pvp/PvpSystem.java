@@ -21,7 +21,7 @@ public final class PvpSystem extends JavaPlugin {
 
     private static PvpSystem instance;
     private static String PREFIX;
-    private static final boolean DEV_MODE = true;
+    private static final boolean DEV_MODE = false;
 
     private DatabaseManager databaseManager;
 
