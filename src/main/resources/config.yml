@@ -21,7 +21,8 @@ lang:
       setOffOther: "&7You successfully &cdisabled &7the peaceful mode for &6%player%"
 
     lookup:
-      filterError: "&cInvalid filter: &7%filter%"
+      filterError: "&cError parsing filter: %error%"
+      noEntries: "&cThere are no entries matching you query"
 
       ui:
         header: "&7===== &aLookup Result (%entries% Entries) &7====="

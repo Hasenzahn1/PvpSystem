@@ -35,7 +35,10 @@ public class DeathHistoryCommand extends LookupCommand {
         }
 
         args[0] = "u:" + args[0];
-        super.onCommand(sender, command, label, args);
+        String[] newArgs = new  String[args.length + 1];
+        System.arraycopy(args, 0, newArgs, 1, args.length);
+        newArgs[0] = "ty:death";
+        super.onCommand(sender, command, label, newArgs);
         return true;
     }
 
@@ -45,6 +48,9 @@ public class DeathHistoryCommand extends LookupCommand {
         if(args.length == 1) return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(f -> f.toLowerCase().startsWith(args[0].toLowerCase())).toList();
 
         args[0] = "u:" + args[0];
-        return super.onTabComplete(sender, command, label, args);
+        String[] newArgs = new  String[args.length + 1];
+        System.arraycopy(args, 0, newArgs, 1, args.length);
+        newArgs[0] = "ty:death";
+        return super.onTabComplete(sender, command, label, newArgs);
     }
 }

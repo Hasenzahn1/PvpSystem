@@ -5,6 +5,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -21,11 +22,18 @@ public class LookupFilter {
             "r", "radius",
             "m", "mode",
             "ty", "type",
-            "t", "time"
+            "t", "time",
+            "af", "after"
     );
 
     // Duration pattern: 1d2h30m or 2h or 30m or 1d etc.
     private static final Pattern DURATION_PATTERN = Pattern.compile("(?:(\\d+)d)?(?:(\\d+)h)?(?:(\\d+)m)?");
+
+    public static final List<String> FILTER_KEYS = List.of("u:", "a:", "c:", "w:", "r:", "m:", "ty:", "t:", "af:");
+
+    public static String resolveKey(String key) {
+        return SHORTCUTS.getOrDefault(key.toLowerCase(), key.toLowerCase());
+    }
 
     // Parsed filter values
     private UUID playerUuid;
@@ -35,6 +43,9 @@ public class LookupFilter {
     private Integer mode;
     private EntryType type;
     private Long timeThreshold;
+    private Long timeUpperBound;
+    private Long timeDuration;
+    private Long afterDuration;
     private Integer radius;
 
     private String parseError;
@@ -55,6 +66,7 @@ public class LookupFilter {
                 return false;
             }
         }
+        computeTimeFilters();
         return true;
     }
 
@@ -78,6 +90,7 @@ public class LookupFilter {
             case "mode" -> parseMode(value);
             case "type" -> parseType(value);
             case "time" -> parseTime(value);
+            case "after" -> parseAfter(value);
             case "radius" -> parseRadius(value);
             default -> {
                 parseError = "Unknown filter: " + key;
@@ -159,11 +172,11 @@ public class LookupFilter {
         };
     }
 
-    private boolean parseTime(String value) {
+    private Long parseDuration(String value) {
         Matcher matcher = DURATION_PATTERN.matcher(value.toLowerCase());
         if (!matcher.matches()) {
             parseError = "Invalid duration format: " + value + " (expected format like 1d2h30m, 2h, 30m)";
-            return false;
+            return null;
         }
 
         long millis = 0;
@@ -173,21 +186,41 @@ public class LookupFilter {
 
         if (days == null && hours == null && minutes == null) {
             parseError = "Invalid duration format: " + value + " (expected format like 1d2h30m, 2h, 30m)";
-            return false;
+            return null;
         }
 
-        if (days != null) {
-            millis += Long.parseLong(days) * 24 * 60 * 60 * 1000;
-        }
-        if (hours != null) {
-            millis += Long.parseLong(hours) * 60 * 60 * 1000;
-        }
-        if (minutes != null) {
-            millis += Long.parseLong(minutes) * 60 * 1000;
-        }
+        if (days != null) millis += Long.parseLong(days) * 24 * 60 * 60 * 1000;
+        if (hours != null) millis += Long.parseLong(hours) * 60 * 60 * 1000;
+        if (minutes != null) millis += Long.parseLong(minutes) * 60 * 1000;
 
-        this.timeThreshold = System.currentTimeMillis() - millis;
+        return millis;
+    }
+
+    private boolean parseTime(String value) {
+        Long millis = parseDuration(value);
+        if (millis == null) return false;
+        this.timeDuration = millis;
         return true;
+    }
+
+    private boolean parseAfter(String value) {
+        Long millis = parseDuration(value);
+        if (millis == null) return false;
+        this.afterDuration = millis;
+        return true;
+    }
+
+    private void computeTimeFilters() {
+        if (timeDuration == null && afterDuration == null) return;
+        long now = System.currentTimeMillis();
+        if (afterDuration != null && timeDuration != null) {
+            this.timeUpperBound = now - afterDuration;
+            this.timeThreshold = now - afterDuration - timeDuration;
+        } else if (afterDuration != null) {
+            this.timeUpperBound = now - afterDuration;
+        } else {
+            this.timeThreshold = now - timeDuration;
+        }
     }
 
     private boolean parseRadius(String value) {
@@ -237,6 +270,10 @@ public class LookupFilter {
         return timeThreshold;
     }
 
+    public Long getTimeUpperBound() {
+        return timeUpperBound;
+    }
+
     public Integer getRadius() {
         return radius;
     }
@@ -247,7 +284,7 @@ public class LookupFilter {
 
     public boolean hasFilters() {
         return playerUuid != null || attacker != null || cause != null ||
-                world != null || mode != null || type != null || timeThreshold != null || radius != null;
+                world != null || mode != null || type != null || timeThreshold != null || timeUpperBound != null || radius != null;
     }
 
     public String getFilterSummary() {
@@ -280,9 +317,11 @@ public class LookupFilter {
         if (type != null) {
             sb.append("ty:").append(type.name().toLowerCase()).append(" ");
         }
-        if (timeThreshold != null) {
-            long diff = System.currentTimeMillis() - timeThreshold;
-            sb.append("t:").append(formatDuration(diff)).append(" ");
+        if (timeDuration != null) {
+            sb.append("t:").append(formatDuration(timeDuration)).append(" ");
+        }
+        if (afterDuration != null) {
+            sb.append("af:").append(formatDuration(afterDuration)).append(" ");
         }
         if (radius != null) {
             sb.append("r:").append(radius).append(" ");

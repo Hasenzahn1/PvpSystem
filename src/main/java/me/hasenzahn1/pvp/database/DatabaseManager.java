@@ -200,6 +200,12 @@ public class DatabaseManager {
                 hasCondition = true;
             }
 
+            if (filter.getTimeUpperBound() != null) {
+                if (hasCondition) where.and();
+                where.le("timestamp", filter.getTimeUpperBound());
+                hasCondition = true;
+            }
+
             if (!hasCondition) {
                 return playerDeathDao.queryBuilder()
                         .orderBy("timestamp", false)
@@ -257,6 +263,12 @@ public class DatabaseManager {
             if (filter.getTimeThreshold() != null) {
                 if (hasCondition) where.and();
                 where.ge("timestamp", filter.getTimeThreshold());
+                hasCondition = true;
+            }
+
+            if (filter.getTimeUpperBound() != null) {
+                if (hasCondition) where.and();
+                where.le("timestamp", filter.getTimeUpperBound());
                 hasCondition = true;
             }
 

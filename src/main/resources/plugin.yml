@@ -14,23 +14,3 @@ commands:
   deathhistory:
     description: "Search for deaths of players"
     usage: "/deathhistory <player>"
-
-permissions:
-  pvpsystem.commands.peaceful:
-    description: "Allows using the /peaceful command"
-    default: true
-  pvpsystem.commands.peaceful.other:
-    description: "Allows setting peaceful mode for other players"
-    default: op
-  pvpsystem.commands.deathhistory:
-    description: "Allows viewing death history of players"
-    default: op
-  pvpsystem.commands.deathhistory.teleport:
-    description: "Allows teleporting to death locations"
-    default: op
-  pvpsystem.commands.deathhistory.inventory:
-    description: "Allows viewing death inventories"
-    default: op
-  pvpsystem.commands.deathhistory.reset:
-    description: "Allows restoring inventory and XP from deaths"
-    default: op
