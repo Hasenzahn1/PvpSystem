@@ -3,6 +3,9 @@ version: '1.0-SNAPSHOT'
 main: me.hasenzahn1.pvp.PvpSystem
 api-version: '1.21'
 
+softdepend:
+  - PlaceholderAPI
+
 commands:
   peaceful:
     description: "Command to make a player peaceful"

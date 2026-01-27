@@ -3,11 +3,12 @@ package me.hasenzahn1.pvp;
 import me.hasenzahn1.pvp.commands.DeathHistoryCommand;
 import me.hasenzahn1.pvp.commands.LookupCommand;
 import me.hasenzahn1.pvp.commands.PeacefulCommand;
-import me.hasenzahn1.pvp.commands.lookup.LookupEntry;
 import me.hasenzahn1.pvp.commands.lookup.PlayerSearchResult;
 import me.hasenzahn1.pvp.database.DatabaseManager;
 import me.hasenzahn1.pvp.listeners.ConnectionListener;
 import me.hasenzahn1.pvp.listeners.DamageListener;
+import me.hasenzahn1.pvp.listeners.InventoryListener;
+import me.hasenzahn1.pvp.papi.PvpPlaceholderExtension;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,18 +16,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public final class PvpSystem extends JavaPlugin {
 
     private static PvpSystem instance;
     private static String PREFIX;
-    private static final boolean DEV_MODE = false;
+    private static final boolean DEV_MODE = true;
 
     private DatabaseManager databaseManager;
 
-    private HashMap<UUID, PlayerSearchResult> playerSearchResults = new HashMap<>();
+    private final HashMap<UUID, PlayerSearchResult> playerSearchResults = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -57,6 +57,11 @@ public final class PvpSystem extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) { //
+            new PvpPlaceholderExtension().register(); //
+        }
     }
 
     @Override

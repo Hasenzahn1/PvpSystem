@@ -20,7 +20,7 @@ public class DeathHistoryCommand extends LookupCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NonNull @NotNull String[] args) {
-        if(!sender.hasPermission("pvpsystem.commands.deathhistory")){
+        if(!sender.hasPermission("pvpsystem.commands.lookup.deathhistory")){
             sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.noPermission")));
             return true;
         }
@@ -44,7 +44,7 @@ public class DeathHistoryCommand extends LookupCommand {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NonNull @NotNull String[] args) {
-        if(!sender.hasPermission("pvpsystem.commands.deathhistory")) return List.of();
+        if(!sender.hasPermission("pvpsystem.commands.lookup.deathhistory")) return List.of();
         if(args.length == 1) return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(f -> f.toLowerCase().startsWith(args[0].toLowerCase())).toList();
 
         args[0] = "u:" + args[0];

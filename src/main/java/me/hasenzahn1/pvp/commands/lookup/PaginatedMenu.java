@@ -1,6 +1,7 @@
 package me.hasenzahn1.pvp.commands.lookup;
 
 import me.hasenzahn1.pvp.PvpSystem;
+import me.hasenzahn1.pvp.database.PlayerDamageEntry;
 import me.hasenzahn1.pvp.database.Serializer;
 import me.hasenzahn1.pvp.utils.PlaceholderUtil;
 import net.kyori.adventure.text.Component;
@@ -16,8 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PaginatedMenu {
 
@@ -25,6 +25,8 @@ public class PaginatedMenu {
             .lifetime(Duration.ofMinutes(60))
             .uses(100)
             .build();
+
+    public static final ArrayList<UUID> playersWithInvOpen = new ArrayList<>();
 
     private Player player;
     private PlayerSearchResult result;
@@ -75,8 +77,10 @@ public class PaginatedMenu {
         Component attackerHealthComponent = Component.text(Math.round(attackerHealth) + "");
 
         Component posComponent = buildPosComponent(location);
+        if(!player.hasPermission("pvpsystem.commands.lookup.teleport")) posComponent = Component.text("");
 
         Component infoComponent = buildInfoComponent(entry);
+        if(!player.hasPermission("pvpsystem.commands.lookup.info")) infoComponent = Component.text("");
 
         String lineTemplate = entry.isDeath() ? PvpSystem.getLang("commands.lookup.ui.entry.deathLine") : PvpSystem.getLang("commands.lookup.ui.entry.damageLine");
 
@@ -162,6 +166,7 @@ public class PaginatedMenu {
 
         TextComponent.Builder builder = Component.text();
         if(player.hasPermission("pvpsystem.commands.lookup.view")) builder.append(buildViewComponent(entry));
+        if(player.hasPermission("pvpsystem.commands.lookup.openinv")) builder.append(buildOpenInvComponent(entry));
         if(player.hasPermission("pvpsystem.commands.lookup.reset")) builder.append(buildResetComponent(entry));
 
         player.sendMessage(builder.build());
@@ -191,6 +196,7 @@ public class PaginatedMenu {
 
                     inventory.setItem(9*4+4, offhand[0]);
 
+                    playersWithInvOpen.add(player.getUniqueId());
                     player.openInventory(inventory);
                 },  OPTIONS));
     }
@@ -213,6 +219,15 @@ public class PaginatedMenu {
                     player.getInventory().setContents(contents);
                     player.getInventory().setArmorContents(armor);
                     player.getInventory().setItemInOffHand(offhand[0]);
+                },  OPTIONS));
+    }
+
+    private Component buildOpenInvComponent(LookupEntry entry){
+        if(entry.isDamage()) return Component.text("");
+        return Component.text(PvpSystem.getLang("commands.lookup.ui.info.openInvButton"))
+                .hoverEvent(Component.text(PvpSystem.getLang("commands.lookup.ui.info.openInvHover")))
+                .clickEvent(ClickEvent.callback((audience) -> {
+                    player.performCommand("openinv " + entry.getUuid());
                 },  OPTIONS));
     }
 

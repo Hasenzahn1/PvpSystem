@@ -6,10 +6,12 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 - Logs all player deaths and damage events with attacker, cause, location, and inventory
 - Advanced lookup system with combinable filters and tab completion
-- Interactive paginated UI with clickable teleport, info, and inventory actions
+- Interactive paginated UI with clickable teleport, info, inventory view, and inventory restore actions
 - Per-player death history command
 - Peaceful mode toggle to flag non-PvP players
+- Configurable cooldown preventing players from switching to peaceful mode after PvP combat
 - Inventory viewing and restoration from death records
+- PlaceholderAPI support (`%pvpsystem_isPeaceful%`)
 - Fully customizable messages via `config.yml`
 - SQLite database storage
 
@@ -17,6 +19,7 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 - Paper 1.21.1+
 - Java 21+
+- (Optional) [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) for placeholder support
 
 ## Commands
 
@@ -30,14 +33,17 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 ## Permissions
 
-| Permission                          | Description                             |
-|-------------------------------------|-----------------------------------------|
-| `pvpsystem.commands.peaceful`       | Use `/peaceful` on yourself             |
-| `pvpsystem.commands.peaceful.other` | Set peaceful mode for other players     |
-| `pvpsystem.commands.lookup`         | Use `/pvplookup`                        |
-| `pvpsystem.commands.lookup.view`    | View death inventories in the lookup UI |
-| `pvpsystem.commands.lookup.reset`   | Restore inventories from the lookup UI  |
-| `pvpsystem.commands.deathhistory`   | Use `/deathhistory`                     |
+| Permission                              | Description                                          |
+|-----------------------------------------|------------------------------------------------------|
+| `pvpsystem.commands.peaceful`           | Use `/peaceful` on yourself                          |
+| `pvpsystem.commands.peaceful.other`     | Set peaceful mode for other players                  |
+| `pvpsystem.commands.lookup`             | Use `/pvplookup`                                     |
+| `pvpsystem.commands.lookup.teleport`    | Use the teleport button in the lookup UI             |
+| `pvpsystem.commands.lookup.info`        | View detailed info in the lookup UI                  |
+| `pvpsystem.commands.lookup.view`        | View death inventories in the lookup UI              |
+| `pvpsystem.commands.lookup.openinv`     | Open a player's current inventory from the lookup UI |
+| `pvpsystem.commands.lookup.reset`       | Restore inventories from the lookup UI               |
+| `pvpsystem.commands.lookup.deathhistory`| Use `/deathhistory`                                  |
 
 ## Filter Reference
 
@@ -96,16 +102,34 @@ Events involving peaceful-mode players within 50 blocks of you.
 ```
 Steve's deaths in the last day.
 
+## Peaceful Mode Cooldown
+
+After a player engages in PvP combat, they are prevented from switching to peaceful mode for a configurable duration. This stops players from abusing peaceful mode to escape combat.
+
+- The cooldown only applies when a player tries to enable peaceful mode on **themselves** -- admins setting another player's mode are not affected.
+- The cooldown timer starts on PvP actions (dealing or receiving PvP damage).
+- Configurable via `peacefulCommandCooldownAfterPvp` in `config.yml` (value in milliseconds, default `60000` = 60 seconds).
+- When a player tries to enable peaceful mode while the cooldown is active, they receive a configurable denial message (`commands.peaceful.cooldown` in `config.yml`).
+
+## PlaceholderAPI
+
+If [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) is installed, the following placeholder is available:
+
+| Placeholder                | Description                                                         |
+|----------------------------|---------------------------------------------------------------------|
+| `%pvpsystem_isPeaceful%`   | Returns `true` if the player is in peaceful mode, `false` otherwise |
+
 ## Configuration
 
 The `config.yml` contains the following settings:
 
-| Key                    | Description                                   | Default                   |
-|------------------------|-----------------------------------------------|---------------------------|
-| `prefix`               | Chat message prefix                           | `&7[&3Pvp&1System&7]: &f` |
-| `joinMessageDuration`  | Ticks to display join mode message            | `100`                     |
-| `damageThreshold`      | Damage event queue size before flushing to DB | `6`                       |
-| `damageBelowThreshold` | Minimum damage entries to keep in queue       | `1`                       |
-| `lastDamageDuration`   | Duration (ms) to track last damage source     | `2000`                    |
+| Key                               | Description                                                 | Default                     |
+|-----------------------------------|-------------------------------------------------------------|-----------------------------|
+| `prefix`                          | Chat message prefix                                         | `&7[&3Pvp&1System&7]: &f`   |
+| `joinMessageDuration`             | Ticks to display join mode message                          | `100`                       |
+| `damageThreshold`                 | Damage event queue size before flushing to DB               | `6`                         |
+| `damageBelowThreshold`            | Minimum damage entries to keep in queue                     | `1`                         |
+| `lastDamageDuration`              | Duration (ms) to track last damage source                   | `2000`                      |
+| `peacefulCommandCooldownAfterPvp` | Cooldown (ms) before peaceful mode can be enabled after PvP | `60000`                     |
 
 All chat messages, UI text, hover text, and button labels can be customized under the `lang` section using `&` color codes and `%placeholder%` variables.

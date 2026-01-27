@@ -1,11 +1,13 @@
 prefix: "&7[&3Pvp&1System&7]: &f"
 
+#In Ticks
 joinMessageDuration: 100
 
 damageThreshold: 6
 damageBelowThreshold: 1
 lastDamageDuration: 2000
 
+peacefulCommandCooldownAfterPvp: 60000
 
 
 lang:
@@ -13,12 +15,20 @@ lang:
     noPermission: "&cYou don't have permission to use this command"
     noPlayer: "&cYou have to be a player to use this command"
     invalidCommand: "&cPlease use &6%command%"
+    notAPlayer: "&cUnknown player with name %name%"
 
     peaceful:
       setOn: "&7You successfully &aenabled &7the peaceful mode for yourself"
       setOff: "&7You successfully &cdisabled &7the peaceful mode for yourself"
       setOnOther: "&7You successfully &aenabled &7the peaceful mode for &6%player%"
       setOffOther: "&7You successfully &cdisabled &7the peaceful mode for &6%player%"
+      alreadyOn: "&7The peaceful mode is already on"
+      alreadyOff: "&7The peaceful mode is already off"
+      alreadyOnOther: "&7The peaceful mode flag for player %player% is already on"
+      alreadyOffOther: "&7The peaceful mode flag for player %player% is already off"
+      onByOther: "&7Peaceful mode has been activated by %from%"
+      offByOther: "&7Peaceful mode has been deactivated by %from%"
+      cooldown: "&cYou can't change the mode to peaceful during pvp"
 
     lookup:
       filterError: "&cError parsing filter: %error%"
@@ -55,11 +65,13 @@ lang:
 
         info:
           damageInfo: "&7 ======= &eDamage Information &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause% &7did &c%originalDamage% &7reduced to &c%originalDamage%"
-          deathInfo: "&7 ======= &eDeath Information: &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause%\n&7Levels Lost: &a%levels%   &7Items in Inv: &e%itemsInInv%"
+          deathInfo: "&7 ======= &eDeath Information: &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause%\n&7Levels Lost: &a%levels%   &7Itemstacks in Inv: &e%itemsInInv%"
           viewButton: "&a[View] "
           viewHover: "Click to view the Inventory"
           resetButton: "&c[Reset]"
           resetHover: "Click to reset the Inventory\n&4This will replace the current Inventory"
+          openInvButton: "&c[OpenInv]"
+          openInvHover: "Click to view the players current Inventory"
 
         inventoryTitle: "&7Death Inventory - &e%player%"
         playerNotOnline: "&cThe player has to be only to reset the inventory"

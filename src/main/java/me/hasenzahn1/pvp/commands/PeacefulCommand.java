@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.codehaus.plexus.util.cli.shell.CommandShell;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -35,16 +36,9 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if(!(sender instanceof Player)) {
-            sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.noPlayer")));
-            return true;
-        }
-
-        Player player = (Player) sender;
-
         //Toggle
         if(args.length == 0) {
-            handleToggle(player);
+            handleToggle(sender);
             return true;
         }
 
@@ -55,14 +49,14 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            handleSet(player, player, getBoolean(args[0]));
+            handleSet(sender, sender, getBoolean(args[0]));
             return true;
         }
 
         //<player> <on/off>
         if(args.length == 2) {
             if(!isPlayer(args[0])) {
-                sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.invalidCommand", "command", "/" + label + " <player> <on/off>")));
+                sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.notAPlayer", "name", args[0])));
                 return true;
             }
             if(!isBoolean(args[1])) {
@@ -75,31 +69,56 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            handleSet(player, getPlayer(args[0]), getBoolean(args[1]));
+            handleSet(sender, getPlayer(args[0]), getBoolean(args[1]));
         }
         return true;
     }
 
-    private void handleToggle(Player player){
-        PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(player.getUniqueId());
+    private void handleToggle(CommandSender player){
+        if(!(player instanceof Player)) {
+            player.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.noPlayer")));
+            return;
+        }
+
+        PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(((Player) player).getUniqueId());
         handleSet(player, player, !state.state);
     }
 
-    private void handleSet(Player executor, Player player, boolean newState){
-        System.out.println(System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(executor.getUniqueId(), 0L));
-        if(player == executor && (System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(executor.getUniqueId(), 0L) < peacefulCommandCooldownAfterPvp)) {
+    private void handleSet(CommandSender executor, CommandSender player, boolean newState){
+        if(!(player instanceof Player)) {
+            player.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.noPlayer")));
+            return;
+        }
+
+        if(newState && player == executor&& (System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(((Player) executor).getUniqueId(), 0L) < peacefulCommandCooldownAfterPvp)) {
             executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.cooldown")));
             return;
         }
-        PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(player.getUniqueId());
-        state.state = newState;
+        PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(((Player) player).getUniqueId());
+        if(state.state == newState) {
+            if(executor == player){
+                if(state.state) executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.alreadyOn")));
+                else executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.alreadyOff")));
+            }else{
+                if(state.state) executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.alreadyOnOther", "player", player.getName())));
+                else executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.alreadyOffOther", "player", player.getName())));
+            }
+            return;
+        }
 
+        state.state = newState;
         if(executor == player) {
             if (state.state) executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOn")));
             else executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOff")));
         }else{
-            if (state.state) executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOnOther", "player", player.getName())));
-            else executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOffOther", "player", player.getName())));
+            if (state.state) {
+                executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOnOther", "player", player.getName())));
+                player.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.onByOther", "from", executor.getName())));
+            }
+            else {
+                executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOffOther", "player", player.getName())));
+                player.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.offByOther", "from", executor.getName())));
+            }
         }
     }
 
