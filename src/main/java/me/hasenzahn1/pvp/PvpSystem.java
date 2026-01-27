@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ public final class PvpSystem extends JavaPlugin {
         instance = this;
         databaseManager = new DatabaseManager();
 
-        if(DEV_MODE) {
+        if(DEV_MODE || !new File(getDataFolder(), "config.yml").exists()) {
             saveResource("config.yml", true);
             reloadConfig();
         }
