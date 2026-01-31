@@ -9,6 +9,32 @@ lastDamageDuration: 2000
 
 peacefulCommandCooldownAfterPvp: 60000
 
+damageEntryButtons:
+  replay:
+    displayCondition: "HAS_TRIGGER"
+    display: " &5[Replay]"
+    hover: "Click to view the recorded replay. \n&7May produce an error when replay is invalid."
+    command: "replay play %triggerKey%"
+
+deathEntryButtons:
+  openinv:
+    displayCondition: "ALL"
+    display: "&c[OpenInv] "
+    hover: "Click to view the players current Inventory"
+    command: "openinv %uuid%"
+  replay:
+    displayCondition: "HAS_TRIGGER"
+    display: " &5[Replay]"
+    hover: "Click to view the recorded replay. \n&7May produce an error when replay is invalid."
+    command: "replay play %triggerKey%"
+
+actionTrigger:
+  enabled: true
+  activateCommands:
+    - 'advancedreplay:replay start %triggerKey%'
+  delaySinceLastEvent: 15000
+  deactivateCommands:
+    - 'advancedreplay:replay stop %triggerKey%'
 
 lang:
   commands:
@@ -45,8 +71,8 @@ lang:
           pos: "&e[Pos]"
           posHover: "Teleport to location\n&7%world%, (%x%, %y%, %z%)"
           info: "&9[Info]"
-          damageInfoHover: "&eDamage Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%&7(&a%defenderHealth%&7)\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Damage Done: &c%damage%\n&7Original Damage: &c%originalDamage%\n\n&7Click for more actions"
-          deathInfoHover: "&eDeath Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Levels Lost: &a%levels%\n&7Items in Inv: &e%itemsInInv%\n\n&7Click for more actions"
+          damageInfoHover: "&eDamage Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%&7(&a%defenderHealth%&7)\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Damage Done: &c%damage%\n&7Original Damage: &c%originalDamage%\n&7Trigger key: &e%triggerKey%\n\n&7Click for more actions"
+          deathInfoHover: "&eDeath Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Levels Lost: &a%levels%\n&7Items in Inv: &e%itemsInInv%\n&7Trigger key: &e%triggerKey%\n\n&7Click for more actions"
           teleportSuccess: "Successfully teleported, Click here to get back to survival mode."
           teleportHover: "Click here to get back to survival"
 
@@ -70,8 +96,6 @@ lang:
           viewHover: "Click to view the Inventory"
           resetButton: "&c[Reset]"
           resetHover: "Click to reset the Inventory\n&4This will replace the current Inventory"
-          openInvButton: "&c[OpenInv]"
-          openInvHover: "Click to view the players current Inventory"
 
         inventoryTitle: "&7Death Inventory - &e%player%"
         playerNotOnline: "&cThe player has to be only to reset the inventory"

@@ -70,7 +70,7 @@ public class DatabaseManager {
         }
     }
 
-    private void flushAllDamageEntriesToDatabase(){
+    public void flushAllDamageEntriesToDatabase(){
         if(damageEntryQueue.isEmpty()){
             return;
         }

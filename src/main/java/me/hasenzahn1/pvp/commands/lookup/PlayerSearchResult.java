@@ -24,9 +24,6 @@ public class PlayerSearchResult {
 
     public List<LookupEntry> getEntriesForPage() {
         this.page = Math.max(0, Math.min(this.page, Math.floorDiv(entries.size(), ENTRIES_PER_PAGE)));
-        System.out.println("currentPage: " + this.page);
-        System.out.println("StartIndex: " + this.page * ENTRIES_PER_PAGE);
-        System.out.println("EndIndex: " + Math.min((this.page + 1) * ENTRIES_PER_PAGE,  entries.size()));
         return entries.subList(this.page * ENTRIES_PER_PAGE, Math.min((this.page + 1) * ENTRIES_PER_PAGE,  entries.size()));
     }
 
@@ -45,5 +42,4 @@ public class PlayerSearchResult {
     public int getEntryCount(){
         return entries.size();
     }
-
 }

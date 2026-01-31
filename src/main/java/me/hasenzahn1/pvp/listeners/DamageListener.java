@@ -2,6 +2,7 @@ package me.hasenzahn1.pvp.listeners;
 
 import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.commands.PeacefulCommand;
+import me.hasenzahn1.pvp.commands.lookup.LookupEntry;
 import me.hasenzahn1.pvp.database.PlayerDamageEntry;
 import me.hasenzahn1.pvp.database.PlayerDeathEntry;
 import me.hasenzahn1.pvp.database.PlayerStateEntry;
@@ -47,12 +48,14 @@ public class DamageListener implements Listener {
         timeAtLastDeath.put(event.getEntity().getUniqueId(), System.currentTimeMillis());
 
         PlayerDamageEntry entry = new PlayerDamageEntry(event, damage);
+        if(entry.getAttackerMode() == 1 || entry.getDefenderMode() == 1) PvpSystem.getInstance().getActionTriggerManager().registerDamage(new LookupEntry(entry));
         entry.create();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(PlayerDeathEvent event) {
         PlayerDeathEntry entry = new PlayerDeathEntry(event);
+        if(entry.getAttackerMode() == 1 || entry.getDefenderMode() == 1) PvpSystem.getInstance().getActionTriggerManager().registerDamage(new LookupEntry(entry));
         entry.create();
 
         Player player = EventUtils.getCausingPlayerFromEvent(event.getEntity().getLastDamageCause());

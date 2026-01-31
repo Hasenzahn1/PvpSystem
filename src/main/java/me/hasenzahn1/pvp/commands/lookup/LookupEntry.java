@@ -1,5 +1,6 @@
 package me.hasenzahn1.pvp.commands.lookup;
 
+import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.database.PlayerDamageEntry;
 import me.hasenzahn1.pvp.database.PlayerDeathEntry;
 import me.hasenzahn1.pvp.database.Serializer;
@@ -10,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 public class LookupEntry {
@@ -95,6 +97,10 @@ public class LookupEntry {
         return isDeath ? playerDeathEntry.getAttackerHealth() : playerDamageEntry.getAttackerHealth();
     }
 
+    public String getTriggerKey(){
+        return isDeath ? playerDeathEntry.getTriggerKey() : playerDamageEntry.getTriggerKey();
+    }
+
     public int getItemsInInv(){
         if(isDamage()) return 0;
 
@@ -153,5 +159,34 @@ public class LookupEntry {
         } catch (IllegalArgumentException e) {
             return attacker;
         }
+    }
+
+    public String getModeColor(int mode){
+        return switch (mode) {
+            case 1 -> PvpSystem.getLang("commands.lookup.ui.entry.mode.peaceful");
+            case 0 -> PvpSystem.getLang("commands.lookup.ui.entry.mode.violent");
+            default -> PvpSystem.getLang("commands.lookup.ui.entry.mode.non");
+        };
+    }
+
+    public Object[] getReplacementParameters(){
+        return new Object[] {
+                "uuid", getUuid(),
+                "defender", getModeColor(getDefenderMode()) + getDefenderName(),
+                "attacker", getModeColor(getAttackerMode()) + getAttackerName(),
+                "cause", getCause(),
+                "attackerHealth", String.format("%.1f", getAttackerHealth()),
+                "defenderHealth", String.format("%.1f", getDefenderHealth()),
+                "timestamp", new SimpleDateFormat(PvpSystem.getLang("commands.lookup.ui.entry.timestamp")).format(getTimestamp()),
+                "world", getWorld(),
+                "x", String.format("%.1f", getX()),
+                "y", String.format("%.1f", getY()),
+                "z", String.format("%.1f", getZ()),
+                "levels", getLevels(),
+                "damage", String.format("%.1f", getDamage()),
+                "originalDamage", String.format("%.1f", getOriginalDamage()),
+                "itemsInInv", getItemsInInv(),
+                "triggerKey", getTriggerKey()
+        };
     }
 }

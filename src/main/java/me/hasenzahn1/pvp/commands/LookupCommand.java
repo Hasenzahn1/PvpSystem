@@ -3,7 +3,7 @@ package me.hasenzahn1.pvp.commands;
 import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.commands.lookup.LookupEntry;
 import me.hasenzahn1.pvp.commands.lookup.LookupFilter;
-import me.hasenzahn1.pvp.commands.lookup.PaginatedMenu;
+import me.hasenzahn1.pvp.menu.PaginatedMenu;
 import me.hasenzahn1.pvp.commands.lookup.PlayerSearchResult;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -60,6 +60,7 @@ public class LookupCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        PvpSystem.getInstance().getDatabase().flushAllDamageEntriesToDatabase();
         PlayerSearchResult result = new PlayerSearchResult(entries);
         PvpSystem.getInstance().getPlayerSearchResults().put(((Player) sender).getUniqueId(), result);
 

@@ -1,7 +1,6 @@
 package me.hasenzahn1.pvp.listeners;
 
-import me.hasenzahn1.pvp.commands.lookup.PaginatedMenu;
-import me.hasenzahn1.pvp.debug.ObjectPrinter;
+import me.hasenzahn1.pvp.menu.PaginatedMenu;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;

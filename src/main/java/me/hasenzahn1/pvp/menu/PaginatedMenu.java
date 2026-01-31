@@ -1,7 +1,8 @@
-package me.hasenzahn1.pvp.commands.lookup;
+package me.hasenzahn1.pvp.menu;
 
 import me.hasenzahn1.pvp.PvpSystem;
-import me.hasenzahn1.pvp.database.PlayerDamageEntry;
+import me.hasenzahn1.pvp.commands.lookup.LookupEntry;
+import me.hasenzahn1.pvp.commands.lookup.PlayerSearchResult;
 import me.hasenzahn1.pvp.database.Serializer;
 import me.hasenzahn1.pvp.utils.PlaceholderUtil;
 import net.kyori.adventure.text.Component;
@@ -21,7 +22,7 @@ import java.util.*;
 
 public class PaginatedMenu {
 
-    private static final ClickCallback.Options OPTIONS = ClickCallback.Options.builder()
+    public static final ClickCallback.Options OPTIONS = ClickCallback.Options.builder()
             .lifetime(Duration.ofMinutes(60))
             .uses(100)
             .build();
@@ -70,13 +71,13 @@ public class PaginatedMenu {
         SimpleDateFormat formatter = new SimpleDateFormat(PvpSystem.getLang("commands.lookup.ui.entry.timestamp"));
         Component timestampComponent = Component.text(formatter.format(timestamp));
 
-        Component defenderComponent = Component.text(getModeColor(defenderMode) + defender);
-        Component attackerComponent = Component.text(getModeColor(attackerMode) + attacker);
+        Component defenderComponent = Component.text(entry.getModeColor(defenderMode) + defender);
+        Component attackerComponent = Component.text(entry.getModeColor(attackerMode) + attacker);
 
         Component defenderHealthComponent = Component.text(Math.round(defenderHealth) + "");
         Component attackerHealthComponent = Component.text(Math.round(attackerHealth) + "");
 
-        Component posComponent = buildPosComponent(location);
+        Component posComponent = buildPosComponent(entry);
         if(!player.hasPermission("pvpsystem.commands.lookup.teleport")) posComponent = Component.text("");
 
         Component infoComponent = buildInfoComponent(entry);
@@ -95,18 +96,13 @@ public class PaginatedMenu {
         ));
     }
 
-    private Component buildPosComponent(Location location){
-        if(location == null) return null;
+    private Component buildPosComponent(LookupEntry entry){
+        if(entry == null) return null;
         return Component.text(PvpSystem.getLang("commands.lookup.ui.entry.pos"))
-                .hoverEvent(Component.text(PvpSystem.getLang("commands.lookup.ui.entry.posHover",
-                        "world", location.getWorld().getName(),
-                        "x", location.getBlockX(),
-                        "y", location.getBlockY(),
-                        "z", location.getBlockZ()
-                )))
+                .hoverEvent(Component.text(PvpSystem.getLang("commands.lookup.ui.entry.posHover", entry.getReplacementParameters())))
                 .clickEvent(ClickEvent.callback((audience) -> {
                     player.setGameMode(GameMode.SPECTATOR);
-                    player.teleport(new Location(location.getWorld(), location.getX(), Math.max(location.getY(), -64), location.getZ()));
+                    player.teleport(new Location(Bukkit.getWorld(entry.getWorld()), entry.getX(), Math.max(entry.getY(), -64), entry.getZ()));
 
                     player.sendMessage(buildSuccessTeleportComponent());
                 }, OPTIONS));
@@ -122,22 +118,7 @@ public class PaginatedMenu {
 
     private Component buildInfoComponent(LookupEntry entry){
         String template = entry.isDeath() ? "commands.lookup.ui.entry.deathInfoHover" : "commands.lookup.ui.entry.damageInfoHover";
-        Component hover = Component.text(PvpSystem.getLang(template,
-                "defender", getModeColor(entry.getDefenderMode()) + entry.getDefenderName(),
-                "attacker", getModeColor(entry.getAttackerMode()) + entry.getAttackerName(),
-                "cause", entry.getCause(),
-                "attackerHealth", String.format("%.1f", entry.getAttackerHealth()),
-                "defenderHealth", String.format("%.1f", entry.getDefenderHealth()),
-                "timestamp", new SimpleDateFormat(PvpSystem.getLang("commands.lookup.ui.entry.timestamp")).format(entry.getTimestamp()),
-                "world", entry.getWorld(),
-                "x", entry.getX(),
-                "y", entry.getY(),
-                "z", entry.getZ(),
-                "levels", entry.getLevels(),
-                "damage", String.format("%.1f", entry.getDamage()),
-                "originalDamage", String.format("%.1f", entry.getOriginalDamage()),
-                "itemsInInv", entry.getItemsInInv()
-                ));
+        Component hover = Component.text(PvpSystem.getLang(template, entry.getReplacementParameters()));
         return Component.text(PvpSystem.getLang("commands.lookup.ui.entry.info")).hoverEvent(hover).clickEvent(ClickEvent.callback((audience) -> {
             displayInfoInterface(entry);
         }, OPTIONS));
@@ -145,30 +126,24 @@ public class PaginatedMenu {
 
     private void displayInfoInterface(LookupEntry entry){
         String template = entry.isDeath() ? "commands.lookup.ui.info.deathInfo" : "commands.lookup.ui.info.damageInfo";
-        Component text = Component.text(PvpSystem.getLang(template,
-                "defender", getModeColor(entry.getDefenderMode()) + entry.getDefenderName(),
-                "attacker", getModeColor(entry.getAttackerMode()) + entry.getAttackerName(),
-                "cause", entry.getCause(),
-                "attackerHealth", String.format("%.1f", entry.getAttackerHealth()),
-                "defenderHealth", String.format("%.1f", entry.getDefenderHealth()),
-                "timestamp", new SimpleDateFormat(PvpSystem.getLang("commands.lookup.ui.entry.timestamp")).format(entry.getTimestamp()),
-                "world", entry.getWorld(),
-                "x", entry.getX(),
-                "y", entry.getY(),
-                "z", entry.getZ(),
-                "levels", entry.getLevels(),
-                "damage", String.format("%.1f", entry.getDamage()),
-                "originalDamage", String.format("%.1f", entry.getOriginalDamage()),
-                "itemsInInv", entry.getItemsInInv()
-        ));
+        Component text = Component.text(PvpSystem.getLang(template, entry.getReplacementParameters()));
         player.sendMessage(text);
-        if(!entry.isDeath()) return;
-
         TextComponent.Builder builder = Component.text();
-        if(player.hasPermission("pvpsystem.commands.lookup.view")) builder.append(buildViewComponent(entry));
-        if(player.hasPermission("pvpsystem.commands.lookup.openinv")) builder.append(buildOpenInvComponent(entry));
-        if(player.hasPermission("pvpsystem.commands.lookup.reset")) builder.append(buildResetComponent(entry));
+        if(entry.isDeath()) {
+            if(player.hasPermission("pvpsystem.commands.lookup.view")) builder.append(buildViewComponent(entry));
+            if(player.hasPermission("pvpsystem.commands.lookup.reset")) builder.append(buildResetComponent(entry));
+        }
 
+        List<MenuButton> buttons;
+        if(entry.isDeath()) buttons = PvpSystem.getInstance().getDeathMenuButtons();
+        else buttons = PvpSystem.getInstance().getDamageMenuButtons();
+        for(MenuButton button : buttons){
+            Component c = button.getAsTextComponent(player, entry);
+            System.out.println(c);
+            builder.append(c);
+        }
+        Component built = builder.build();
+        if(built.children().isEmpty()) return;
         player.sendMessage(builder.build());
     }
 
@@ -220,23 +195,6 @@ public class PaginatedMenu {
                     player.getInventory().setArmorContents(armor);
                     player.getInventory().setItemInOffHand(offhand[0]);
                 },  OPTIONS));
-    }
-
-    private Component buildOpenInvComponent(LookupEntry entry){
-        if(entry.isDamage()) return Component.text("");
-        return Component.text(PvpSystem.getLang("commands.lookup.ui.info.openInvButton"))
-                .hoverEvent(Component.text(PvpSystem.getLang("commands.lookup.ui.info.openInvHover")))
-                .clickEvent(ClickEvent.callback((audience) -> {
-                    player.performCommand("openinv " + entry.getUuid());
-                },  OPTIONS));
-    }
-
-    private String getModeColor(int mode){
-        return switch (mode) {
-            case 1 -> PvpSystem.getLang("commands.lookup.ui.entry.mode.peaceful");
-            case 0 -> PvpSystem.getLang("commands.lookup.ui.entry.mode.violent");
-            default -> PvpSystem.getLang("commands.lookup.ui.entry.mode.non");
-        };
     }
 
     private Component buildPaginationComponent(){

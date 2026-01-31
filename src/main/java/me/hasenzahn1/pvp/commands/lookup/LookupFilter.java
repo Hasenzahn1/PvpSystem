@@ -66,6 +66,12 @@ public class LookupFilter {
                 return false;
             }
         }
+
+        if (radius == null && timeDuration == null && afterDuration == null && playerUuid == null) {
+            parseError = "You must specify either a radius (r:), time (t:/af:), or user (u:) filter";
+            return false;
+        }
+
         computeTimeFilters();
         return true;
     }

@@ -70,6 +70,9 @@ public class PlayerDeathEntry {
     @DatabaseField
     private double attackerHealth;
 
+    @DatabaseField
+    private String triggerKey;
+
     public PlayerDeathEntry() {}
 
     public PlayerDeathEntry(PlayerDeathEvent event){
@@ -102,6 +105,11 @@ public class PlayerDeathEntry {
             PlayerStateEntry attackerState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(attackingPlayer.getUniqueId(), null);
             if(attackerState == null) this.attackerMode = -1;
             else this.attackerMode = attackerState.state ? 1 : 0;
+        }
+
+        this.triggerKey = "";
+        if(attackingPlayer != null) {
+            triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(event.getPlayer(), attackingPlayer);
         }
     }
 
@@ -190,5 +198,13 @@ public class PlayerDeathEntry {
 
     public double getAttackerHealth() {
         return attackerHealth;
+    }
+
+    public String getTriggerKey() {
+        return triggerKey;
+    }
+
+    public void setTriggerKey(String triggerKey) {
+        this.triggerKey = triggerKey;
     }
 }

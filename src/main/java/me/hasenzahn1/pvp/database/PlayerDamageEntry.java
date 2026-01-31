@@ -60,6 +60,9 @@ public class PlayerDamageEntry {
     @DatabaseField
     private double defenderHealth;
 
+    @DatabaseField
+    private String triggerKey;
+
     public PlayerDamageEntry() {}
 
     public PlayerDamageEntry(EntityDamageEvent event, double originalDamage) {
@@ -89,6 +92,12 @@ public class PlayerDamageEntry {
             if(attackerState == null) this.attackerMode = -1;
             else this.attackerMode = attackerState.state ? 1 : 0;
         }
+
+        triggerKey = "";
+        if(attackingEntity instanceof Player) {
+            triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(Bukkit.getPlayer(uuid), (Player) attackingEntity);
+        }
+
     }
 
     public void create(){
@@ -154,5 +163,13 @@ public class PlayerDamageEntry {
 
     public double getDefenderHealth() {
         return defenderHealth;
+    }
+
+    public String getTriggerKey() {
+        return triggerKey;
+    }
+
+    public void setTriggerKey(String triggerKey) {
+        this.triggerKey = triggerKey;
     }
 }
