@@ -1,6 +1,6 @@
-prefix: "&7[&3Pvp&1System&7]: &f"
+prefix: "&8[&bPvP&9System&8]&7: &f"
 
-#In Ticks
+# In Ticks
 joinMessageDuration: 100
 
 damageThreshold: 6
@@ -12,69 +12,69 @@ peacefulCommandCooldownAfterPvp: 60000
 damageEntryButtons:
   replay:
     displayCondition: "HAS_TRIGGER"
-    display: "&5[Replay] "
-    hover: "Click to view the recorded replay. \n&7May produce an error when replay is invalid."
+    display: "&d[Replay]&7 "
+    hover: "&eClick&7 to watch the recorded replay.\n&8May fail if the replay is invalid."
     command: "replay play %triggerKey%"
 
 deathEntryButtons:
   openinv:
     displayCondition: "ALL"
-    display: " &c[OpenInv]"
-    hover: "Click to view the players current Inventory"
+    display: " &c[OpenInv]&7"
+    hover: "&eClick&7 to view the player's current inventory."
     command: "openinv %uuid%"
   replay:
     displayCondition: "HAS_TRIGGER"
-    display: " &5[Replay]"
-    hover: "Click to view the recorded replay. \n&7May produce an error when replay is invalid."
+    display: " &d[Replay]&7"
+    hover: "&eClick&7 to watch the recorded replay.\n&8May fail if the replay is invalid."
     command: "replay play %triggerKey%"
 
 actionTrigger:
   enabled: true
   activateCommands:
-    - 'advancedreplay:replay start %triggerKey%'
+    - "advancedreplay:replay start %triggerKey%"
   delaySinceLastEvent: 15000
   deactivateCommands:
-    - 'advancedreplay:replay stop %triggerKey%'
+    - "advancedreplay:replay stop %triggerKey%"
 
 lang:
   commands:
-    noPermission: "&cYou don't have permission to use this command"
-    noPlayer: "&cYou have to be a player to use this command"
-    invalidCommand: "&cPlease use &6%command%"
-    notAPlayer: "&cUnknown player with name %name%"
+    noPermission: "&cYou don't have permission to use this command."
+    noPlayer: "&cOnly players can use this command."
+    invalidCommand: "&cUsage: &e%command%"
+    notAPlayer: "&cNo player found with name &e%name%&c."
 
     peaceful:
-      setOn: "&7You successfully &aenabled &7the peaceful mode for yourself"
-      setOff: "&7You successfully &cdisabled &7the peaceful mode for yourself"
-      setOnOther: "&7You successfully &aenabled &7the peaceful mode for &6%player%"
-      setOffOther: "&7You successfully &cdisabled &7the peaceful mode for &6%player%"
-      alreadyOn: "&7The peaceful mode is already on"
-      alreadyOff: "&7The peaceful mode is already off"
-      alreadyOnOther: "&7The peaceful mode flag for player %player% is already on"
-      alreadyOffOther: "&7The peaceful mode flag for player %player% is already off"
-      onByOther: "&7Peaceful mode has been activated by %from%"
-      offByOther: "&7Peaceful mode has been deactivated by %from%"
-      cooldown: "&cYou can't change the mode to peaceful during pvp"
+      setOn: "&7Peaceful mode: &aenabled&7."
+      setOff: "&7Peaceful mode: &cdisabled&7."
+      setOnOther: "&7Peaceful mode for &e%player%&7: &aenabled&7."
+      setOffOther: "&7Peaceful mode for &e%player%&7: &cdisabled&7."
+      alreadyOn: "&7Peaceful mode is already &aenabled&7."
+      alreadyOff: "&7Peaceful mode is already &cdisabled&7."
+      alreadyOnOther: "&7Peaceful mode for &e%player%&7 is already &aenabled&7."
+      alreadyOffOther: "&7Peaceful mode for &e%player%&7 is already &cdisabled&7."
+      onByOther: "&7Peaceful mode was &aenabled&7 by &e%from%&7."
+      offByOther: "&7Peaceful mode was &cdisabled&7 by &e%from%&7."
+      cooldown: "&cYou can't enable Peaceful mode while in PvP cooldown."
 
     lookup:
-      filterError: "&cError parsing filter: %error%"
-      noEntries: "&cThere are no entries matching you query"
+      filterError: "&cError parsing filter: &e%error%"
+      noEntries: "&cNo entries match your query."
 
       ui:
-        header: "&7===== &aLookup Result (%entries% Entries) &7====="
+        header: "&8-----&8[ &aLookup Results &7(&e%entries%&7) &8]-----"
 
         entry:
-          deathLine: "%timestamp% %defender%&7 &4slain by %attacker%&7 %pos% %info%"
-          damageLine: "%timestamp% %defender%&7 &rdamaged by %attacker%&7 %pos% %info%"
+          deathLine: "%timestamp% &c☠ &e%defender%&7 was slain by &e%attacker%&7 %pos% %info%"
+          damageLine: "%timestamp% &6⚔ &e%defender%&7 was hit by &e%attacker%&7 %pos% %info%"
 
-          timestamp: "&7[dd.MM hh:mm]"
+          timestamp: "&8[&7dd.MM HH:mm&8]"
           pos: "&e[Pos]"
-          posHover: "Teleport to location\n&7%world%, (%x%, %y%, %z%)"
-          info: "&9[Info]"
-          damageInfoHover: "&eDamage Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%&7(&a%defenderHealth%&7)\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Damage Done: &c%damage%\n&7Original Damage: &c%originalDamage%\n&7Trigger key: &e%triggerKey%\n\n&7Click for more actions"
-          deathInfoHover: "&eDeath Information:\n&7Timestamp: &e%timestamp%\n&7Victim: %defender%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7Cause: &e%cause%\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Levels Lost: &a%levels%\n&7Items in Inv: &e%itemsInInv%\n&7Trigger key: &e%triggerKey%\n\n&7Click for more actions"
-          teleportSuccess: "Successfully teleported, Click here to get back to survival mode."
-          teleportHover: "Click here to get back to survival"
+          posHover: "&eClick&7 to teleport.\n&8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)"
+          info: "&b[Info]"
+          damageInfoHover: "&eDamage Details:\n&7Time: &f%timestamp%\n&7Victim: &e%defender% &7(&a%defenderHealth%❤&7)\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Cause: &f%cause%\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Damage: &c%damage%\n&7Original: &c%originalDamage%\n&7Trigger: &e%triggerKey%\n\n&8Click for actions."
+          deathInfoHover: "&eDeath Details:\n&7Time: &f%timestamp%\n&7Victim: &e%defender%\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Cause: &f%cause%\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Levels lost: &a%levels%\n&7Items in inv: &e%itemsInInv%\n&7Trigger: &e%triggerKey%\n\n&8Click for actions."
+          teleportSuccess: "&aTeleported&7. &eClick&7 to return to survival."
+          teleportHover: "&eClick&7 to return to survival."
 
           mode:
             peaceful: "&a"
@@ -82,48 +82,47 @@ lang:
             non: "&7"
 
         page:
-          template: "&7Page: &r%current%&7/&r%max% %prev%&7(%pages%&7) %next%"
-          prev: "&8◀ "
-          next: "&8▶"
-          selectedPage: "&e&l&n%page%"
-          otherPage: "&r%page%"
-          separator: " &8| "
+          template: "&8Page: &e%current%&8/&7%max%  %prev%&8%pages% %next%"
+          prev: "&7◀ "
+          next: "&7▶"
+          selectedPage: "&e&l%page%"
+          otherPage: "&7%page%"
+          separator: "&8 | "
 
         info:
-          damageInfo: "&7 ======= &eDamage Information &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause% &7did &c%originalDamage% &7reduced to &c%originalDamage%"
-          deathInfo: "&7 ======= &eDeath Information: &7- %defender%&7(&a%defenderHealth%&7) &7======= \n&7At: %timestamp%\n&7Attacker: %attacker%&7(&a%attackerHealth%&7)\n&7At: &e(%world%, %x%, %y%, %z%)\n&7Cause: &e%cause%\n&7Levels Lost: &a%levels%   &7Itemstacks in Inv: &e%itemsInInv%"
-          viewButton: "&a[View] "
-          viewHover: "Click to view the Inventory"
-          resetButton: "&c[Reset]"
-          resetHover: "Click to reset the Inventory\n&4This will replace the current Inventory"
+          damageInfo: "&8&m-----&8[ &eDamage Info &7- &e%defender% &7(&a%defenderHealth%❤&7) &8]&m-----\n&7Time: &f%timestamp%\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Cause: &f%cause%\n&7Damage: &c%originalDamage% &7→ &c%damage%"
+          deathInfo: "&8&m-----&8[ &cDeath Info &7- &e%defender% &7(&a%defenderHealth%❤&7) &8]&m-----\n&7Time: &f%timestamp%\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Cause: &f%cause%\n&7Levels lost: &a%levels%  &7Itemstacks: &e%itemsInInv%"
+          viewButton: "&a[View]&7 "
+          viewHover: "&eClick&7 to view the inventory."
+          resetButton: "&c[Reset]&7"
+          resetHover: "&eClick&7 to reset the inventory.\n&4This replaces the current inventory!"
 
-        inventoryTitle: "&7Death Inventory - &e%player%"
-        playerNotOnline: "&cThe player has to be only to reset the inventory"
-
+        inventoryTitle: "&8Death Inventory &7- &e%player%"
+        playerNotOnline: "&cThe player must be online to reset the inventory."
 
   join:
     message:
-      peaceful: "&7Joined with mode: &aPeaceful"
-      notPeaceful: "&6Joined with mode: &aNot Peaceful"
+      peaceful: "&7Mode: &aPeaceful"
+      notPeaceful: "&7Mode: &cPvP Enabled"
 
-  # Possible placeholders for all messages. %attacker%, %defender%
+  # Placeholders: %attacker%, %defender%
   damage:
     message:
       attacker:
-        isPeaceful: "You are in Peaceful mode. Do not attack other players!"
-        isNotPeaceful: "Your opponent in in peaceful mode. Killing him may result in further punishment"
+        isPeaceful: "&cYou're in &aPeaceful&c mode. Don't attack players!"
+        isNotPeaceful: "&eWarning:&7 Your opponent is in &aPeaceful&7 mode. Attacking may be punished."
 
       defender:
-        isPeaceful: "Peaceful mode protection: %attacker% is attacking you"
-        isNotPeaceful: "You are protected as the other player is in peaceful mode."
+        isPeaceful: "&e%attacker%&c is attacking you &7while you're in &aPeaceful&7 mode!"
+        isNotPeaceful: "&7You're protected because the other player is in &aPeaceful&7 mode."
 
-  # Possible placeholders for all messages. %attacker%, %defender%
+  # Placeholders: %attacker%, %defender%
   death:
     message:
       attacker:
-        isPeaceful: "You killed another player whilst being in peaceful mode. This can result in further punishment!"
-        isNotPeaceful: "You kills a player in peaceful mode. This can result in further punishment!"
+        isPeaceful: "&cYou killed a player while in &aPeaceful&c mode. This may be punished!"
+        isNotPeaceful: "&eWarning:&7 You killed a player in &aPeaceful&7 mode. This may be punished!"
 
       defender:
-        isPeaceful: "You were killed while being in peaceful mode. If this is not fine with you report %attacker% for killing"
-        isNotPeaceful: "You were killed by a player in peaceful mode. You can still report that player %attacker%"
+        isPeaceful: "&cYou died while in &aPeaceful&c mode. Report &e%attacker%&c if this was unfair."
+        isNotPeaceful: "&cYou were killed by a player in &aPeaceful&c mode. You can report &e%attacker%&c."
