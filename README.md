@@ -43,7 +43,6 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 | `pvpsystem.commands.lookup.teleport`      | Use the teleport button in the lookup UI             |
 | `pvpsystem.commands.lookup.info`          | View detailed info in the lookup UI                  |
 | `pvpsystem.commands.lookup.view`          | View death inventories in the lookup UI              |
-| `pvpsystem.commands.lookup.openinv`       | Open a player's current inventory from the lookup UI |
 | `pvpsystem.commands.lookup.reset`         | Restore inventories from the lookup UI               |
 | `pvpsystem.commands.lookup.deathhistory`  | Use `/deathhistory`                                  |
 

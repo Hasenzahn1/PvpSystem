@@ -23,8 +23,8 @@ import java.util.*;
 public class PaginatedMenu {
 
     public static final ClickCallback.Options OPTIONS = ClickCallback.Options.builder()
-            .lifetime(Duration.ofMinutes(60))
-            .uses(100)
+            .lifetime(ClickCallback.DEFAULT_LIFETIME)
+            .uses(ClickCallback.UNLIMITED_USES)
             .build();
 
     public static final ArrayList<UUID> playersWithInvOpen = new ArrayList<>();
