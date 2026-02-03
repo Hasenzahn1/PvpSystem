@@ -12,14 +12,14 @@ peacefulCommandCooldownAfterPvp: 60000
 damageEntryButtons:
   replay:
     displayCondition: "HAS_TRIGGER"
-    display: " &5[Replay]"
+    display: "&5[Replay] "
     hover: "Click to view the recorded replay. \n&7May produce an error when replay is invalid."
     command: "replay play %triggerKey%"
 
 deathEntryButtons:
   openinv:
     displayCondition: "ALL"
-    display: "&c[OpenInv] "
+    display: " &c[OpenInv]"
     hover: "Click to view the players current Inventory"
     command: "openinv %uuid%"
   replay:

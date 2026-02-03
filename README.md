@@ -11,6 +11,8 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 - Peaceful mode toggle to flag non-PvP players
 - Configurable cooldown preventing players from switching to peaceful mode after PvP combat
 - Inventory viewing and restoration from death records
+- Action triggers to automatically run commands on PvP events involving peaceful players
+- Configurable custom menu buttons in the lookup info view
 - PlaceholderAPI support (`%pvpsystem_isPeaceful%`)
 - Fully customizable messages via `config.yml`
 - SQLite database storage
@@ -33,17 +35,17 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 ## Permissions
 
-| Permission                              | Description                                          |
-|-----------------------------------------|------------------------------------------------------|
-| `pvpsystem.commands.peaceful`           | Use `/peaceful` on yourself                          |
-| `pvpsystem.commands.peaceful.other`     | Set peaceful mode for other players                  |
-| `pvpsystem.commands.lookup`             | Use `/pvplookup`                                     |
-| `pvpsystem.commands.lookup.teleport`    | Use the teleport button in the lookup UI             |
-| `pvpsystem.commands.lookup.info`        | View detailed info in the lookup UI                  |
-| `pvpsystem.commands.lookup.view`        | View death inventories in the lookup UI              |
-| `pvpsystem.commands.lookup.openinv`     | Open a player's current inventory from the lookup UI |
-| `pvpsystem.commands.lookup.reset`       | Restore inventories from the lookup UI               |
-| `pvpsystem.commands.lookup.deathhistory`| Use `/deathhistory`                                  |
+| Permission                                | Description                                          |
+|-------------------------------------------|------------------------------------------------------|
+| `pvpsystem.commands.peaceful`             | Use `/peaceful` on yourself                          |
+| `pvpsystem.commands.peaceful.other`       | Set peaceful mode for other players                  |
+| `pvpsystem.commands.lookup`               | Use `/pvplookup`                                     |
+| `pvpsystem.commands.lookup.teleport`      | Use the teleport button in the lookup UI             |
+| `pvpsystem.commands.lookup.info`          | View detailed info in the lookup UI                  |
+| `pvpsystem.commands.lookup.view`          | View death inventories in the lookup UI              |
+| `pvpsystem.commands.lookup.openinv`       | Open a player's current inventory from the lookup UI |
+| `pvpsystem.commands.lookup.reset`         | Restore inventories from the lookup UI               |
+| `pvpsystem.commands.lookup.deathhistory`  | Use `/deathhistory`                                  |
 
 ## Filter Reference
 
@@ -101,6 +103,74 @@ Events involving peaceful-mode players within 50 blocks of you.
 /deathhistory Steve t:1d
 ```
 Steve's deaths in the last day.
+
+## Action Triggers
+
+Action triggers let the server automatically run commands when PvP combat involving a peaceful-mode player is detected. This is useful for integrating with third-party plugins such as replay recorders.
+
+When a damage or death event occurs where at least one of the involved players has peaceful mode enabled, the plugin:
+
+1. Generates a unique **trigger key** for that combat pair.
+2. Runs all configured `activateCommands` as console (e.g. starting a replay recording).
+3. Keeps the trigger alive as long as new combat events between the same pair keep occurring.
+4. Once no new events have occurred for the configured `delaySinceLastEvent` duration, runs all `deactivateCommands` as console (e.g. stopping the recording).
+
+The trigger key is stored with every logged damage and death entry, and is visible in the `[Info]` hover tooltip in the lookup UI. It can also be used as a placeholder in custom menu buttons (see below).
+
+### Action Trigger Settings
+
+| Key                                 | Description                                                                 | Default |
+|-------------------------------------|-----------------------------------------------------------------------------|---------|
+| `actionTrigger.enabled`             | Whether action triggers are active                                          | `true`  |
+| `actionTrigger.activateCommands`    | List of commands run (as console) when a trigger starts                     | --      |
+| `actionTrigger.deactivateCommands`  | List of commands run (as console) when a trigger expires                    | --      |
+| `actionTrigger.delaySinceLastEvent` | Time in milliseconds after the last combat event before the trigger expires | `15000` |
+
+Commands support the `%triggerKey%` placeholder along with all other standard event placeholders (see placeholder table below).
+
+## Custom Menu Buttons
+
+The buttons shown in the detailed info view of the lookup UI (accessed by clicking `[Info]` on a lookup entry) can be fully customized and extended through `config.yml`. Buttons are defined separately for death entries under `deathEntryButtons` and for damage entries under `damageEntryButtons`.
+
+Each button is defined as a named key (e.g. `replay`, `openinv`) under the respective section, with the following properties:
+
+| Property           | Description                                                                                              |
+|--------------------|----------------------------------------------------------------------------------------------------------|
+| `displayCondition` | When to show the button: `ALL` (always) or `HAS_TRIGGER` (only when the entry has an action trigger key) |
+| `display`          | The button label shown in chat (supports `&` color codes and placeholders)                               |
+| `hover`            | Tooltip text shown when hovering over the button (supports `&` color codes and placeholders)             |
+| `command`          | The command the clicking player will execute (supports placeholders)                                     |
+
+You can add as many buttons as you want. To remove a default button, simply delete its entry from the config.
+
+### Button Permissions
+
+The button name determines its required permission. A button named `replay` requires the permission `pvpsystem.commands.lookup.replay`. A button named `openinv` requires `pvpsystem.commands.lookup.openinv`. Players without the matching permission will not see the button.
+
+The built-in `[View]` and `[Reset]` buttons for death entries are not affected by this system and continue to use their existing permissions (`pvpsystem.commands.lookup.view` and `pvpsystem.commands.lookup.reset`).
+
+## Placeholders
+
+The following placeholders can be used in action trigger commands, custom menu button templates, and info hover text:
+
+| Placeholder        | Description                                                          |
+|--------------------|----------------------------------------------------------------------|
+| `%uuid%`           | UUID of the victim                                                   |
+| `%defender%`       | Name of the victim (color-coded by mode)                             |
+| `%attacker%`       | Name of the attacker (color-coded by mode)                           |
+| `%cause%`          | Damage cause (e.g. `ENTITY_ATTACK`, `FALL`)                          |
+| `%attackerHealth%` | Attacker's health at the time of the event                           |
+| `%defenderHealth%` | Victim's health at the time of the event                             |
+| `%timestamp%`      | Formatted timestamp of the event                                     |
+| `%world%`          | World name where the event occurred                                  |
+| `%x%`              | X coordinate of the event                                            |
+| `%y%`              | Y coordinate of the event                                            |
+| `%z%`              | Z coordinate of the event                                            |
+| `%levels%`         | Experience levels lost (death entries only)                          |
+| `%damage%`         | Final damage dealt (damage entries only)                             |
+| `%originalDamage%` | Original damage before reduction (damage entries only)               |
+| `%itemsInInv%`     | Number of item stacks in the victim's inventory (death entries only) |
+| `%triggerKey%`     | Unique action trigger key for the combat pair (empty if no trigger)  |
 
 ## Peaceful Mode Cooldown
 
