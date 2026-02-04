@@ -79,7 +79,7 @@ public class ActionTriggerManager {
     }
 
     private void startTrigger(LookupEntry entry, String key) {
-        actionTriggerKeys.put(key, entry.getAttackerName() + "_" + new SimpleDateFormat("dd-MM-yyyy_mm-ss").format(new Date()));
+        actionTriggerKeys.put(key, entry.getAttackerName() + "_" + new SimpleDateFormat("dd-MM-yyyy_hh-mm-ss").format(new Date()));
         if(entry.isDeath()) entry.getDeathEntry().setTriggerKey(actionTriggerKeys.get(key));
         else entry.getDamageEntry().setTriggerKey(actionTriggerKeys.get(key));
 
