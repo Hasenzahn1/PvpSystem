@@ -54,12 +54,6 @@ public class DamageListener implements Listener {
         event.setDamage(EntityDamageEvent.DamageModifier.MAGIC, 0);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onDeath(PlayerDeathEvent event) {
-        System.out.println(ObjectPrinter.printInternal(event));
-        System.out.println(event.getPlayer().getKiller());
-    }
-
     private boolean isPlayer(Entity e) {
         return (e instanceof Player);
     }

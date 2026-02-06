@@ -106,9 +106,6 @@ public final class PvpSystem extends JavaPlugin {
                 damageMenuButtons.add(button);
             }
         }
-
-        System.out.println(damageMenuButtons);
-        System.out.println(deathMenuButtons);
     }
 
     @Override

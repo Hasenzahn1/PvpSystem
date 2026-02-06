@@ -139,7 +139,6 @@ public class PaginatedMenu {
         else buttons = PvpSystem.getInstance().getDamageMenuButtons();
         for(MenuButton button : buttons){
             Component c = button.getAsTextComponent(player, entry);
-            System.out.println(c);
             builder.append(c);
         }
         Component built = builder.build();
