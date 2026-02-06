@@ -8,6 +8,7 @@ import me.hasenzahn1.pvp.commands.lookup.PlayerSearchResult;
 import me.hasenzahn1.pvp.database.DatabaseManager;
 import me.hasenzahn1.pvp.listeners.ConnectionListener;
 import me.hasenzahn1.pvp.listeners.DamageListener;
+import me.hasenzahn1.pvp.listeners.DamageLogListener;
 import me.hasenzahn1.pvp.listeners.InventoryListener;
 import me.hasenzahn1.pvp.menu.MenuButton;
 import me.hasenzahn1.pvp.papi.PvpPlaceholderExtension;
@@ -71,6 +72,7 @@ public final class PvpSystem extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
         Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
+        Bukkit.getPluginManager().registerEvents(new DamageLogListener(), this);
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new PvpPlaceholderExtension().register();

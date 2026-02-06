@@ -72,7 +72,7 @@ public class PlayerDamageEntry {
         this.y = event.getEntity().getLocation().getY();
         this.z = event.getEntity().getLocation().getZ();
         this.originalDamage = originalDamage;
-        this.damage = event.getDamage();
+        this.damage = event.getFinalDamage();
         this.attacker = EventUtils.getStringCauseFromEvent(event);
         this.cause = event.getCause();
         this.timestamp = System.currentTimeMillis();
@@ -84,7 +84,7 @@ public class PlayerDamageEntry {
         else this.defenderMode = defenderState.state ? 1 : 0;
 
         //Load Attackemode
-        Entity attackingEntity = EventUtils.getCausingEntityFromEvent(event);
+        Entity attackingEntity = EventUtils.getAttackingEntity(event);
         this.attackerHealth = (attackingEntity instanceof LivingEntity) ? ((LivingEntity) attackingEntity).getHealth() : -1;
         if(!(attackingEntity instanceof Player)) this.attackerMode = -1;
         else {
@@ -93,11 +93,8 @@ public class PlayerDamageEntry {
             else this.attackerMode = attackerState.state ? 1 : 0;
         }
 
-        triggerKey = "";
-        if(attackingEntity instanceof Player) {
-            triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(Bukkit.getPlayer(uuid), (Player) attackingEntity);
-        }
-
+        //Gather trigger key
+        triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(Bukkit.getPlayer(uuid), attackingEntity);
     }
 
     public void create(){

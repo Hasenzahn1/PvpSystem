@@ -3,13 +3,16 @@ package me.hasenzahn1.pvp.actions;
 import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.commands.lookup.LookupEntry;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 public class ActionTriggerManager {
 
@@ -20,14 +23,10 @@ public class ActionTriggerManager {
 
     private int delaySinceLastEvent = 0;
 
-    private final HashMap<String, String> actionTriggerKeys;
-    private final HashMap<String, Long> lastTimestamp;
-    private final HashMap<String, LookupEntry> actionTriggerEntries;
+    private final ArrayList<TriggerEntry> activeTriggers;
 
     public ActionTriggerManager(ConfigurationSection config) {
-        actionTriggerKeys = new HashMap<>();
-        lastTimestamp = new HashMap<>();
-        actionTriggerEntries = new HashMap<>();
+        activeTriggers = new ArrayList<>();
 
         if(config == null) return;
         enabled = config.getBoolean("enabled", false);
@@ -41,17 +40,18 @@ public class ActionTriggerManager {
         if(!enabled) return;
         if(Bukkit.getPlayer(entry.getAttackerName()) == null) return;
         UUID defenderUUID = Bukkit.getPlayer(entry.getAttackerName()).getUniqueId();
-        String key = createUniqueKey(entry.getUuid(), defenderUUID);
-        if(actionTriggerKeys.containsKey(key)) {
-            keepAliveKey(key);
+        TriggerEntry fetchedTrigger = getTrigger(entry.getUuid(), defenderUUID);
+        if(fetchedTrigger != null) {
+            keepAliveKey(fetchedTrigger);
             return;
         }
 
-        startTrigger(entry, key);
+        TriggerEntry trigger = new TriggerEntry(entry.getUuid(), defenderUUID, System.currentTimeMillis(), System.currentTimeMillis(), entry);
+        startTrigger(entry, trigger);
     }
 
-    private void keepAliveKey(String key){
-        lastTimestamp.put(key, System.currentTimeMillis());
+    private void keepAliveKey(TriggerEntry trigger){
+        trigger.currentTimestamp = System.currentTimeMillis();
     }
 
     private void startExpiredTrigger(){
@@ -59,51 +59,79 @@ public class ActionTriggerManager {
         new BukkitRunnable(){
             @Override
             public void run() {
-                List<String> keyToRemove = new ArrayList<>();
-                for(Map.Entry<String, Long> entry : lastTimestamp.entrySet()){
-                    if(System.currentTimeMillis() - entry.getValue() > delaySinceLastEvent){
-                        keyToRemove.add(entry.getKey());
+                List<TriggerEntry> keyToRemove = new ArrayList<>();
+                for(int i = activeTriggers.size() - 1; i >= 0; i--){
+                    TriggerEntry entry = activeTriggers.get(i);
+                    if(System.currentTimeMillis() - entry.currentTimestamp > delaySinceLastEvent){
+                        activeTriggers.remove(i);
+                        keyToRemove.add(entry);
                     }
                 }
-                for(String key : keyToRemove){
+                for(TriggerEntry key : keyToRemove){
                     for(String command : deactivateCommands){
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PvpSystem.parseReplacements(command, actionTriggerEntries.get(key).getReplacementParameters()));
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PvpSystem.parseReplacements(command, key.entry.getReplacementParameters()));
                     }
-                    lastTimestamp.remove(key);
-                    actionTriggerKeys.remove(key);
-                    actionTriggerEntries.remove(key);
                 }
             }
         }.runTaskTimer(PvpSystem.getInstance(), 0, 1);
 
     }
 
-    private void startTrigger(LookupEntry entry, String key) {
-        actionTriggerKeys.put(key, entry.getAttackerName() + "_" + new SimpleDateFormat("dd-MM-yyyy_hh-mm-ss").format(new Date()));
-        if(entry.isDeath()) entry.getDeathEntry().setTriggerKey(actionTriggerKeys.get(key));
-        else entry.getDamageEntry().setTriggerKey(actionTriggerKeys.get(key));
+    private void startTrigger(LookupEntry entry, TriggerEntry trigger) {
+        if(entry.isDeath()) entry.getDeathEntry().setTriggerKey(trigger.getTriggerKey());
+        else entry.getDamageEntry().setTriggerKey(trigger.getTriggerKey());
 
         for(String command : activateCommands) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PvpSystem.parseReplacements(command, entry.getReplacementParameters()));
         }
-        lastTimestamp.put(key, System.currentTimeMillis());
-        actionTriggerEntries.put(key, entry);
+
+        activeTriggers.add(trigger);
     }
 
-    public String getActionTriggerKey(Player attacker, Player defender) {
-        String key = createUniqueKey(attacker.getUniqueId(), defender.getUniqueId());
-        return actionTriggerKeys.get(key);
+    private TriggerEntry getTrigger(UUID defender, UUID attacker) {
+        for(TriggerEntry entry : activeTriggers){
+            if(entry.attacker == attacker && entry.defender == defender) return entry;
+        }
+        return null;
     }
 
-    public static String createUniqueKey(UUID a, UUID b) {
-        if (a == null || b == null) {
-            throw new IllegalArgumentException("UUIDs must not be null");
+    private TriggerEntry getTrigger(UUID defender) {
+        for(TriggerEntry entry : activeTriggers){
+            if(entry.defender == defender) return entry;
+        }
+        return null;
+    }
+
+    public String getActionTriggerKey(Player attacker, Entity defender) {
+        if(defender == null) {
+            TriggerEntry trigger = getTrigger(attacker.getUniqueId());
+            if(trigger == null) return "";
+            return trigger.getTriggerKey();
         }
 
-        UUID first = a.compareTo(b) <= 0 ? a : b;
-        UUID second = a.compareTo(b) <= 0 ? b : a;
+        TriggerEntry trigger = getTrigger(attacker.getUniqueId(), defender.getUniqueId());
+        if(trigger == null) return "";
+        return trigger.getTriggerKey();
+    }
 
-        return first.toString() + "_" + second.toString();
+    private static class TriggerEntry {
+        public UUID attacker;
+        public UUID defender;
+        public long startTimestamp;
+        public long currentTimestamp;
+        LookupEntry entry;
+
+        public TriggerEntry(UUID defender, UUID attacker, long startTimestamp, long currentTimestamp, LookupEntry entry) {
+            this.defender = defender;
+            this.attacker = attacker;
+            this.startTimestamp = startTimestamp;
+            this.currentTimestamp = currentTimestamp;
+            this.entry = entry;
+        }
+
+        public String getTriggerKey(){
+            return Bukkit.getOfflinePlayer(attacker).getName() + "_" + new SimpleDateFormat("dd-MM-yyyy_hh-mm-ss").format(new Date(startTimestamp));
+        }
     }
 
 }

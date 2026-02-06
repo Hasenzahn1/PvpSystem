@@ -90,7 +90,7 @@ public class PlayerDeathEntry {
         this.cause = event.getEntity().getLastDamageCause() != null ? event.getEntity().getLastDamageCause().getCause() : EntityDamageEvent.DamageCause.CUSTOM;
         this.timestamp = System.currentTimeMillis();
 
-        Entity attackingEntity = EventUtils.getCausingEntityFromEvent(event.getPlayer().getLastDamageCause());
+        Entity attackingEntity = EventUtils.getAttackingEntity(event.getPlayer().getLastDamageCause());
         this.attackerHealth = (attackingEntity instanceof LivingEntity) ? ((LivingEntity) attackingEntity).getHealth() : -1;
 
         //Load Defendermode
@@ -107,10 +107,8 @@ public class PlayerDeathEntry {
             else this.attackerMode = attackerState.state ? 1 : 0;
         }
 
-        this.triggerKey = "";
-        if(attackingPlayer != null) {
-            triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(event.getPlayer(), attackingPlayer);
-        }
+        //Gather trigger key
+        triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(event.getPlayer(), attackingPlayer);
     }
 
     public Player getAttacker(){

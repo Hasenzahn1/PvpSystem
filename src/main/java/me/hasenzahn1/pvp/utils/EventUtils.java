@@ -4,22 +4,23 @@ import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class EventUtils {
 
-    public static Player getCausingPlayerFromEvent(EntityDamageEvent event) {
+    public static Entity getAttackingEntity(EntityDamageEvent event) {
         DamageSource source = event.getDamageSource();
-        if(source.getCausingEntity() == null) return null;
-        if(source.getCausingEntity() instanceof Player) return (Player)source.getCausingEntity();
+        if(source.getCausingEntity() != null) return source.getCausingEntity();
+        if(event.getEntity() instanceof Player) return ((Player) event.getEntity()).getKiller();
         return null;
     }
 
-    public static Entity getCausingEntityFromEvent(EntityDamageEvent event) {
-        if(event == null) return null;
+    public static Entity getAttackingEntity(EntityDeathEvent event) {
         DamageSource source = event.getDamageSource();
-        if(source.getCausingEntity() == null) return null;
-        return source.getCausingEntity();
+        if(source.getCausingEntity() != null) return source.getCausingEntity();
+        if(event.getEntity() instanceof Player) return ((Player) event.getEntity()).getKiller();
+        return null;
     }
 
     public static String getStringCauseFromEvent(EntityDamageEvent damageEvent) {
@@ -31,6 +32,7 @@ public class EventUtils {
         DamageSource source = damageEvent.getDamageSource();
         if(source.getCausingEntity() instanceof Player) return source.getCausingEntity().getUniqueId().toString();
         if(source.getCausingEntity() != null) return "#" + source.getCausingEntity().getType().name().toLowerCase();
+        if(player.getKiller() != null) return player.getKiller().getUniqueId().toString();
 
         // no player involved return damage cause
         EntityDamageEvent.DamageCause cause = damageEvent.getCause();

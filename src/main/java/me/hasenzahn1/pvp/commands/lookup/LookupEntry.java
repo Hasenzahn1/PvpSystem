@@ -186,7 +186,7 @@ public class LookupEntry {
                 "damage", String.format("%.1f", getDamage()),
                 "originalDamage", String.format("%.1f", getOriginalDamage()),
                 "itemsInInv", getItemsInInv(),
-                "triggerKey", getTriggerKey()
+                "triggerKey", String.valueOf(getTriggerKey())
         };
     }
 }
