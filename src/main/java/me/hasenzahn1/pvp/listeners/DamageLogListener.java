@@ -42,7 +42,7 @@ public class DamageLogListener implements Listener {
         if(!victimMode && !attackerMode) return; // Ignore PVP vs PVP
         PvpSystem.getInstance().getActionTriggerManager().registerDamage(new LookupEntry(entry));
 
-        //Ignore damage aboce damage Threshold
+        //Ignore damage above damage Threshold
         if(victim.getHealth() - event.getFinalDamage() >= damageThreshold) return;
 
         //Send for attacker
@@ -54,7 +54,7 @@ public class DamageLogListener implements Listener {
         else victim.sendMessage(Component.text(PvpSystem.getPrefixedLang("damage.message.defender.isNotPeaceful", "attacker", attacker.getName(), "defender", victim.getName())));
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true)
     public void onDeathEvent(PlayerDeathEvent event) {
         Player victim = event.getEntity();
 
