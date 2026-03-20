@@ -106,6 +106,13 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        //Player attempts to switch to pvp but is disabled
+        if(executor == player && (state.forcePeaceful || state.disablePVP) && !newState){
+            executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.restricted")));
+            return;
+        }
+
+        //Switch Mode
         state.state = newState;
         if(executor == player) {
             if (state.state) executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOn")));

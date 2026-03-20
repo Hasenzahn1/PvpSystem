@@ -2,6 +2,7 @@ package me.hasenzahn1.pvp.database;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.db.DatabaseType;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
@@ -40,12 +41,30 @@ public class DatabaseManager {
         playerDamageDao = DaoManager.createDao(connectionSource, PlayerDamageEntry.class);
 
         createTables();
+        migrateDatabase();
     }
 
     private void createTables() throws SQLException {
         TableUtils.createTableIfNotExists(connectionSource, PlayerStateEntry.class);
         TableUtils.createTableIfNotExists(connectionSource, PlayerDeathEntry.class);
         TableUtils.createTableIfNotExists(connectionSource, PlayerDamageEntry.class);
+    }
+
+    private void migrateDatabase() throws SQLException {
+        alterTableAddColumn(playerStateDao, "forcePeaceful", "BOOLEAN DEFAULT false");
+        alterTableAddColumn(playerStateDao, "disablePVP", "BOOLEAN DEFAULT false");
+    }
+
+    private void alterTableAddColumn(Dao<?, UUID> tableClass, String column, String definition) {
+        try {
+            tableClass.executeRaw(
+                    "ALTER TABLE " + tableClass.getTableName() + " ADD COLUMN " + column + " " + definition
+            );
+        } catch (Exception e) {
+            if (e.getMessage() == null || !e.getCause().getMessage().contains("duplicate column")) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void disconnect(){

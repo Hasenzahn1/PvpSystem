@@ -70,11 +70,8 @@ public final class PvpSystem extends JavaPlugin {
         getCommand("pvplookup").setExecutor(new LookupCommand());
         getCommand("pvplookup").setTabCompleter(new LookupCommand());
 
-        getCommand("forcepeaceful").setExecutor(new ForcePeacefulCommand());
-        getCommand("forcepeaceful").setTabCompleter(new ForcePeacefulCommand());
-
-        getCommand("disablepvp").setExecutor(new DisablePVPCommand());
-        getCommand("disablepvp").setTabCompleter(new DisablePVPCommand());
+        getCommand("pvpModify").setExecutor(new PvPModifyCommand());
+        getCommand("pvpModify").setTabCompleter(new PvPModifyCommand());
 
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);

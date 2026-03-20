@@ -30,6 +30,16 @@ public class PvpPlaceholderExtension extends PlaceholderExpansion {
             if(entry != null && entry.state) return "true";
             return "false";
         }
+        if(params.equalsIgnoreCase("isPvPDisabled")) {
+            PlayerStateEntry entry = PvpSystem.getInstance().getDatabase().getPlayerStates().get(player.getUniqueId());
+            if(entry != null && entry.disablePVP) return "true";
+            return "false";
+        }
+        if(params.equalsIgnoreCase("isForcePeaceful")) {
+            PlayerStateEntry entry = PvpSystem.getInstance().getDatabase().getPlayerStates().get(player.getUniqueId());
+            if(entry != null && entry.forcePeaceful) return "true";
+            return "false";
+        }
         return null;
     }
 }

@@ -17,3 +17,6 @@ commands:
   deathhistory:
     description: "Search for deaths of players"
     usage: "/deathhistory <player>"
+  pvpmodify:
+    description: "Modify players pvp abilities"
+    usage: "/pvpmodify <player> <forcePeaceful/disablePvp>"
