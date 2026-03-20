@@ -83,7 +83,8 @@ public class PaginatedMenu {
         Component infoComponent = buildInfoComponent(entry);
         if(!player.hasPermission("pvpsystem.commands.lookup.info")) infoComponent = Component.text("");
 
-        String lineTemplate = entry.isDeath() ? PvpSystem.getLang("commands.lookup.ui.entry.deathLine") : PvpSystem.getLang("commands.lookup.ui.entry.damageLine");
+        String lineTemplate = entry.isDeath() ? PvpSystem.getLang("commands.lookup.ui.entry.deathLine") :
+                PvpSystem.getLang(entry.getDamageEntry().isCritical() ? "commands.lookup.ui.entry.damageLine.critical" : "commands.lookup.ui.entry.damageLine.normal");
 
         return PlaceholderUtil.parseTemplate(lineTemplate, Map.of(
                 "timestamp", timestampComponent,

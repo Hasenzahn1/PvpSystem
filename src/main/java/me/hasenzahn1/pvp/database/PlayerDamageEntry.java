@@ -169,4 +169,8 @@ public class PlayerDamageEntry {
     public void setTriggerKey(String triggerKey) {
         this.triggerKey = triggerKey;
     }
+
+    public boolean isCritical(){
+        return defenderHealth <= PvpSystem.getInstance().getDamageThreshold();
+    }
 }

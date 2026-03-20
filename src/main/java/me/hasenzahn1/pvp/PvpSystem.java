@@ -1,9 +1,7 @@
 package me.hasenzahn1.pvp;
 
 import me.hasenzahn1.pvp.actions.ActionTriggerManager;
-import me.hasenzahn1.pvp.commands.DeathHistoryCommand;
-import me.hasenzahn1.pvp.commands.LookupCommand;
-import me.hasenzahn1.pvp.commands.PeacefulCommand;
+import me.hasenzahn1.pvp.commands.*;
 import me.hasenzahn1.pvp.commands.lookup.PlayerSearchResult;
 import me.hasenzahn1.pvp.database.DatabaseManager;
 import me.hasenzahn1.pvp.listeners.ConnectionListener;
@@ -27,7 +25,7 @@ public final class PvpSystem extends JavaPlugin {
 
     private static PvpSystem instance;
     private static String PREFIX;
-    private static final boolean DEV_MODE = false;
+    private static final boolean DEV_MODE = true;
 
     private DatabaseManager databaseManager;
 
@@ -37,6 +35,8 @@ public final class PvpSystem extends JavaPlugin {
     private ArrayList<MenuButton> deathMenuButtons;
 
     private ActionTriggerManager actionTriggerManager;
+
+    private double damageThreshold;
 
     @Override
     public void onEnable() {
@@ -49,6 +49,7 @@ public final class PvpSystem extends JavaPlugin {
         }
 
         PREFIX = ChatColor.translateAlternateColorCodes('&', getConfig().getString("prefix"));
+        damageThreshold = PvpSystem.getInstance().getConfig().getDouble("damageThreshold", 6);
 
         parseMenuButton();
 
@@ -68,6 +69,12 @@ public final class PvpSystem extends JavaPlugin {
 
         getCommand("pvplookup").setExecutor(new LookupCommand());
         getCommand("pvplookup").setTabCompleter(new LookupCommand());
+
+        getCommand("forcepeaceful").setExecutor(new ForcePeacefulCommand());
+        getCommand("forcepeaceful").setTabCompleter(new ForcePeacefulCommand());
+
+        getCommand("disablepvp").setExecutor(new DisablePVPCommand());
+        getCommand("disablepvp").setTabCompleter(new DisablePVPCommand());
 
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new DamageListener(), this);
@@ -151,5 +158,9 @@ public final class PvpSystem extends JavaPlugin {
 
     public ActionTriggerManager getActionTriggerManager() {
         return actionTriggerManager;
+    }
+
+    public double getDamageThreshold(){
+        return damageThreshold;
     }
 }

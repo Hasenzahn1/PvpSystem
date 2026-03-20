@@ -15,7 +15,7 @@ public class CombatTracker {
     private final double lastDamageDuration;
 
     public CombatTracker(){
-        damageThreshold = PvpSystem.getInstance().getConfig().getDouble("damageThreshold", 6);
+        damageThreshold = PvpSystem.getInstance().getDamageThreshold();
         damageBelowThreshold = PvpSystem.getInstance().getConfig().getDouble("damageBelowThreshold", 1);
         lastDamageDuration = PvpSystem.getInstance().getConfig().getDouble("lastDamageDuration", 2000);
     }

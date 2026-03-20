@@ -16,11 +16,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class DamageLogListener implements Listener {
 
-    private final double damageThreshold;
-
-    public DamageLogListener(){
-        damageThreshold = PvpSystem.getInstance().getConfig().getDouble("damageThreshold", 6);
-    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onEntityDamageEvent(EntityDamageEvent event) {
@@ -43,7 +38,7 @@ public class DamageLogListener implements Listener {
         PvpSystem.getInstance().getActionTriggerManager().registerDamage(new LookupEntry(entry));
 
         //Ignore damage above damage Threshold
-        if(victim.getHealth() - event.getFinalDamage() >= damageThreshold) return;
+        if(victim.getHealth() - event.getFinalDamage() >= PvpSystem.getInstance().getDamageThreshold()) return;
 
         //Send for attacker
         if(attackerMode) attacker.sendMessage(Component.text(PvpSystem.getPrefixedLang("damage.message.attacker.isPeaceful", "attacker", attacker.getName(), "defender", victim.getName())));

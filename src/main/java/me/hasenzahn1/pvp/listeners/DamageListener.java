@@ -42,10 +42,18 @@ public class DamageListener implements Listener {
 
         Entity attackingEntity = EventUtils.getAttackingEntity(event);
         if(!isPlayer(attackingEntity)) return; // Only PvP should be restricted
+
+        PlayerStateEntry victimEntry = PvpSystem.getInstance().getDatabase().getPlayerStates().get(victim.getUniqueId());
+        PlayerStateEntry attackerEntry = PvpSystem.getInstance().getDatabase().getPlayerStates().get(victim.getUniqueId());
+        if(victimEntry.disablePVP || attackerEntry.disablePVP) {
+            event.setCancelled(true);
+            return;
+        }
+
         PeacefulCommand.PVP_ACTION_TIMESTAMPS.put(attackingEntity.getUniqueId(), System.currentTimeMillis());
 
-        boolean victimMode = PvpSystem.getInstance().getDatabase().getPlayerStates().get(victim.getUniqueId()).state;
-        boolean attackerMode = PvpSystem.getInstance().getDatabase().getPlayerStates().get(attackingEntity.getUniqueId()).state;
+        boolean victimMode = victimEntry.state;
+        boolean attackerMode = attackerEntry.state;
         if(!victimMode && !attackerMode) return; // Ignore PVP vs PVP
 
         double damage = combatTracker.getMaxDamageToApply(victim, event);

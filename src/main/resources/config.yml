@@ -7,7 +7,7 @@ damageThreshold: 6
 damageBelowThreshold: 1
 lastDamageDuration: 2000
 
-peacefulCommandCooldownAfterPvp: 60000
+peacefulCommandCooldownAfterPvp: 600000
 
 damageEntryButtons:
   replay:
@@ -65,7 +65,9 @@ lang:
 
         entry:
           deathLine: "%timestamp% &c☠ &e%defender%&7 was slain by &e%attacker%&7 %pos% %info%"
-          damageLine: "%timestamp% &6⚔ &e%defender%&7 was hit by &e%attacker%&7 %pos% %info%"
+          damageLine:
+            normal: "%timestamp% &6⚔ &e%defender%&7 was hit by &e%attacker%&7 %pos% %info%"
+            critical: "%timestamp% &6⚔ &e%defender%&7 was &6hit &7by &e%attacker%&7 %pos% %info%"
 
           timestamp: "&8[&7dd.MM HH:mm&8]"
           pos: "&e[Pos]"
@@ -99,6 +101,19 @@ lang:
 
         inventoryTitle: "&8Death Inventory &7- &e%player%"
         playerNotOnline: "&cThe player must be online to reset the inventory."
+
+    forcePeaceful:
+      setEnabled: "&aEnabled force peaceful mode for the player &6%player%"
+      setDisabled: "&eDisabled force peaceful mode for the player &6%player%"
+      enabled: "&7Force peaceful mode has been &eenabled &7for you"
+      disabled: "&7Force peaceful mode has been &cdisabled &7for you"
+
+    disablePvp:
+      setEnabled: "&cDisabled &7all pvp actions for the player &6%player%"
+      setDisabled: "&eReenabled &7all pvp actions for the player &6%player%"
+      enabled: "&7All pvp actions have been &cdisabled &7for you"
+      disabled: "&7All pvp actions have been &ereenabled &7for you"
+
 
   join:
     message:
