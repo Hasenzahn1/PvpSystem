@@ -16,6 +16,7 @@ public class LookupFilter {
     // Filter shortcuts mapping (shortcut -> full name)
     private static final Map<String, String> SHORTCUTS = Map.of(
             "u", "user",
+            "v", "victim",
             "a", "attacker",
             "c", "cause",
             "w", "world",
@@ -29,14 +30,15 @@ public class LookupFilter {
     // Duration pattern: 1d2h30m or 2h or 30m or 1d etc.
     private static final Pattern DURATION_PATTERN = Pattern.compile("(?:(\\d+)d)?(?:(\\d+)h)?(?:(\\d+)m)?");
 
-    public static final List<String> FILTER_KEYS = List.of("u:", "a:", "c:", "w:", "r:", "m:", "ty:", "t:", "af:");
+    public static final List<String> FILTER_KEYS = List.of("u:", "v:", "a:", "c:", "w:", "r:", "m:", "ty:", "t:", "af:");
 
     public static String resolveKey(String key) {
         return SHORTCUTS.getOrDefault(key.toLowerCase(), key.toLowerCase());
     }
 
     // Parsed filter values
-    private UUID playerUuid;
+    private UUID playerUuid;   // victim (v:) — matches defender/uuid column only
+    private UUID userUuid;     // user (u:) — matches either attacker or defender
     private String attacker;
     private EntityDamageEvent.DamageCause cause;
     private String world;
@@ -53,7 +55,7 @@ public class LookupFilter {
     private Player executingPlayer;
 
     public enum EntryType {
-        DEATH, DAMAGE
+        DEATH, DAMAGE, SWITCH
     }
 
     public LookupFilter(Player executingPlayer) {
@@ -67,8 +69,8 @@ public class LookupFilter {
             }
         }
 
-        if (radius == null && timeDuration == null && afterDuration == null && playerUuid == null) {
-            parseError = "You must specify either a radius (r:), time (t:/af:), or user (u:) filter";
+        if (radius == null && timeDuration == null && afterDuration == null && playerUuid == null && userUuid == null && attacker == null) {
+            parseError = "You must specify either a radius (r:), time (t:/af:), user (u:), victim (v:), or attacker (a:) filter";
             return false;
         }
 
@@ -89,7 +91,8 @@ public class LookupFilter {
         key = SHORTCUTS.getOrDefault(key, key);
 
         return switch (key) {
-            case "user" -> parsePlayer(value);
+            case "user" -> parseUser(value);
+            case "victim" -> parsePlayer(value);
             case "attacker" -> parseAttacker(value);
             case "cause" -> parseCause(value);
             case "world" -> parseWorld(value);
@@ -103,6 +106,16 @@ public class LookupFilter {
                 yield false;
             }
         };
+    }
+
+    private boolean parseUser(String value) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(value);
+        if (!player.hasPlayedBefore() && !player.isOnline()) {
+            parseError = "Player not found: " + value;
+            return false;
+        }
+        this.userUuid = player.getUniqueId();
+        return true;
     }
 
     private boolean parsePlayer(String value) {
@@ -171,8 +184,12 @@ public class LookupFilter {
                 this.type = EntryType.DAMAGE;
                 yield true;
             }
+            case "switch" -> {
+                this.type = EntryType.SWITCH;
+                yield true;
+            }
             default -> {
-                parseError = "Invalid type: " + value + " (expected death or damage)";
+                parseError = "Invalid type: " + value + " (expected death, damage or switch)";
                 yield false;
             }
         };
@@ -252,6 +269,10 @@ public class LookupFilter {
         return playerUuid;
     }
 
+    public UUID getUserUuid() {
+        return userUuid;
+    }
+
     public String getAttacker() {
         return attacker;
     }
@@ -295,9 +316,13 @@ public class LookupFilter {
 
     public String getFilterSummary() {
         StringBuilder sb = new StringBuilder();
+        if (userUuid != null) {
+            OfflinePlayer p = Bukkit.getOfflinePlayer(userUuid);
+            sb.append("u:").append(p.getName()).append(" ");
+        }
         if (playerUuid != null) {
             OfflinePlayer p = Bukkit.getOfflinePlayer(playerUuid);
-            sb.append("u:").append(p.getName()).append(" ");
+            sb.append("v:").append(p.getName()).append(" ");
         }
         if (attacker != null) {
             if (attacker.startsWith("#")) {

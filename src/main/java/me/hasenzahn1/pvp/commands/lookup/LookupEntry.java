@@ -3,6 +3,7 @@ package me.hasenzahn1.pvp.commands.lookup;
 import me.hasenzahn1.pvp.PvpSystem;
 import me.hasenzahn1.pvp.database.PlayerDamageEntry;
 import me.hasenzahn1.pvp.database.PlayerDeathEntry;
+import me.hasenzahn1.pvp.database.PlayerModeSwitchEntry;
 import me.hasenzahn1.pvp.database.Serializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,19 +18,33 @@ import java.util.UUID;
 public class LookupEntry {
 
     private final boolean isDeath;
+    private final boolean isSwitch;
     private final PlayerDeathEntry playerDeathEntry;
     private final PlayerDamageEntry playerDamageEntry;
+    private final PlayerModeSwitchEntry playerModeSwitchEntry;
 
     public LookupEntry(PlayerDeathEntry playerDeathEntry) {
         this.playerDeathEntry = playerDeathEntry;
         this.playerDamageEntry = null;
+        this.playerModeSwitchEntry = null;
         this.isDeath = true;
+        this.isSwitch = false;
     }
 
     public LookupEntry(PlayerDamageEntry playerDamageEntry) {
         this.playerDamageEntry = playerDamageEntry;
         this.playerDeathEntry = null;
+        this.playerModeSwitchEntry = null;
         this.isDeath = false;
+        this.isSwitch = false;
+    }
+
+    public LookupEntry(PlayerModeSwitchEntry playerModeSwitchEntry) {
+        this.playerModeSwitchEntry = playerModeSwitchEntry;
+        this.playerDeathEntry = null;
+        this.playerDamageEntry = null;
+        this.isDeath = false;
+        this.isSwitch = true;
     }
 
     public boolean isDeath() {
@@ -37,7 +52,11 @@ public class LookupEntry {
     }
 
     public boolean isDamage() {
-        return !isDeath;
+        return !isDeath && !isSwitch;
+    }
+
+    public boolean isSwitch() {
+        return isSwitch;
     }
 
     public PlayerDeathEntry getDeathEntry() {
@@ -48,13 +67,21 @@ public class LookupEntry {
         return playerDamageEntry;
     }
 
+    public PlayerModeSwitchEntry getSwitchEntry() {
+        return playerModeSwitchEntry;
+    }
+
     // Common accessors
     public long getTimestamp() {
-        return isDeath ? playerDeathEntry.getTimestamp() : playerDamageEntry.getTimestamp();
+        if (isDeath) return playerDeathEntry.getTimestamp();
+        if (isSwitch) return playerModeSwitchEntry.timestamp;
+        return playerDamageEntry.getTimestamp();
     }
 
     public UUID getUuid() {
-        return isDeath ? playerDeathEntry.getUuid() : playerDamageEntry.getUuid();
+        if (isDeath) return playerDeathEntry.getUuid();
+        if (isSwitch) return playerModeSwitchEntry.getUuid();
+        return playerDamageEntry.getUuid();
     }
 
     public String getWorld() {
@@ -82,6 +109,7 @@ public class LookupEntry {
     }
 
     public int getDefenderMode() {
+        if(isSwitch) return playerModeSwitchEntry.mode ? 0 : 1;
         return isDeath ? playerDeathEntry.getDefenderMode() : playerDamageEntry.getDefenderMode();
     }
 
@@ -166,6 +194,20 @@ public class LookupEntry {
             case 1 -> PvpSystem.getLang("commands.lookup.ui.entry.mode.peaceful");
             case 0 -> PvpSystem.getLang("commands.lookup.ui.entry.mode.violent");
             default -> PvpSystem.getLang("commands.lookup.ui.entry.mode.non");
+        };
+    }
+
+    public String getSwitchModeString() {
+        boolean peaceful = playerModeSwitchEntry.isMode();
+        String key = peaceful ? "commands.lookup.ui.entry.mode.peacefulString" : "commands.lookup.ui.entry.mode.violentString";
+        return PvpSystem.getLang(key);
+    }
+
+    public Object[] getSwitchReplacementParameters() {
+        return new Object[]{
+                "timestamp", new SimpleDateFormat(PvpSystem.getLang("commands.lookup.ui.entry.timestamp")).format(getTimestamp()),
+                "player", getDefenderName(),
+                "mode", getSwitchModeString()
         };
     }
 

@@ -59,6 +59,19 @@ public class PaginatedMenu {
     }
 
     private Component buildEntryComponent(LookupEntry entry){
+        if (entry.isSwitch()) {
+            SimpleDateFormat formatter = new SimpleDateFormat(PvpSystem.getLang("commands.lookup.ui.entry.timestamp"));
+            Component timestampComponent = Component.text(formatter.format(entry.getTimestamp()));
+            Component playerComponent = Component.text(entry.getModeColor(entry.getDefenderMode()) + entry.getDefenderName());
+            Component modeComponent = Component.text(entry.getSwitchModeString());
+
+            return PlaceholderUtil.parseTemplate(PvpSystem.getLang("commands.lookup.ui.entry.switchLine"), Map.of(
+                    "timestamp", timestampComponent,
+                    "player", playerComponent,
+                    "mode", modeComponent
+            ));
+        }
+
         long timestamp = entry.getTimestamp();
         String defender = entry.getDefenderName();
         int defenderMode = entry.getDefenderMode();
@@ -126,6 +139,7 @@ public class PaginatedMenu {
     }
 
     private void displayInfoInterface(LookupEntry entry){
+        if (entry.isSwitch()) return;
         String template = entry.isDeath() ? "commands.lookup.ui.info.deathInfo" : "commands.lookup.ui.info.damageInfo";
         Component text = Component.text(PvpSystem.getLang(template, entry.getReplacementParameters()));
         player.sendMessage(text);

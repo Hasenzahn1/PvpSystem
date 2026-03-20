@@ -1,6 +1,7 @@
 package me.hasenzahn1.pvp.commands;
 
 import me.hasenzahn1.pvp.PvpSystem;
+import me.hasenzahn1.pvp.database.PlayerModeSwitchEntry;
 import me.hasenzahn1.pvp.database.PlayerStateEntry;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -91,7 +93,9 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
         }
 
         if(newState && player == executor&& (System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(((Player) executor).getUniqueId(), 0L) < peacefulCommandCooldownAfterPvp)) {
-            executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.cooldown")));
+            long remaining = peacefulCommandCooldownAfterPvp - (System.currentTimeMillis() - PVP_ACTION_TIMESTAMPS.getOrDefault(((Player) executor).getUniqueId(), 0L));
+            Duration duration = Duration.ofMillis(remaining);
+            executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.cooldown", "minutes", duration.toMinutesPart(), "seconds", duration.toSecondsPart())));
             return;
         }
         PlayerStateEntry state = PvpSystem.getInstance().getDatabase().getPlayerStates().get(((Player) player).getUniqueId());
@@ -114,6 +118,9 @@ public class PeacefulCommand implements CommandExecutor, TabCompleter {
 
         //Switch Mode
         state.state = newState;
+        PlayerModeSwitchEntry entry = new PlayerModeSwitchEntry(((Player) player).getUniqueId(), newState);
+        entry.create();
+
         if(executor == player) {
             if (state.state) executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOn")));
             else executor.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.peaceful.setOff")));

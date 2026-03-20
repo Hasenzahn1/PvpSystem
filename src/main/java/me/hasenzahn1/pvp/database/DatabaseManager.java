@@ -27,6 +27,7 @@ public class DatabaseManager {
     private Dao<PlayerStateEntry, UUID> playerStateDao;
     private Dao<PlayerDeathEntry, UUID> playerDeathDao;
     private Dao<PlayerDamageEntry, UUID> playerDamageDao;
+    private Dao<PlayerModeSwitchEntry, UUID> playerModeSwitchDao;
 
     private final HashMap<UUID, PlayerStateEntry> playerStates = new HashMap<>();
     private final ArrayList<PlayerDamageEntry> damageEntryQueue = new ArrayList<>();
@@ -39,6 +40,7 @@ public class DatabaseManager {
         playerStateDao = DaoManager.createDao(connectionSource, PlayerStateEntry.class);
         playerDeathDao = DaoManager.createDao(connectionSource, PlayerDeathEntry.class);
         playerDamageDao = DaoManager.createDao(connectionSource, PlayerDamageEntry.class);
+        playerModeSwitchDao = DaoManager.createDao(connectionSource, PlayerModeSwitchEntry.class);
 
         createTables();
         migrateDatabase();
@@ -48,9 +50,10 @@ public class DatabaseManager {
         TableUtils.createTableIfNotExists(connectionSource, PlayerStateEntry.class);
         TableUtils.createTableIfNotExists(connectionSource, PlayerDeathEntry.class);
         TableUtils.createTableIfNotExists(connectionSource, PlayerDamageEntry.class);
+        TableUtils.createTableIfNotExists(connectionSource, PlayerModeSwitchEntry.class);
     }
 
-    private void migrateDatabase() throws SQLException {
+    private void migrateDatabase() {
         alterTableAddColumn(playerStateDao, "forcePeaceful", "BOOLEAN DEFAULT false");
         alterTableAddColumn(playerStateDao, "disablePVP", "BOOLEAN DEFAULT false");
     }
@@ -105,7 +108,6 @@ public class DatabaseManager {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Fehler beim Batch-Speichern der Damage-Einträge!");
         }
     }
 
@@ -123,6 +125,10 @@ public class DatabaseManager {
 
     public Dao<PlayerDamageEntry, UUID> getPlayerDamageDao() {
         return playerDamageDao;
+    }
+
+    public Dao<PlayerModeSwitchEntry, UUID> getPlayerModeSwitchDao() {
+        return playerModeSwitchDao;
     }
 
     /**
@@ -159,6 +165,14 @@ public class DatabaseManager {
             }
         }
 
+        // Query mode switches if type is null or SWITCH (radius filter does not apply — no location)
+        if (filter.getRadius() == null && (filter.getType() == null || filter.getType() == LookupFilter.EntryType.SWITCH)) {
+            List<PlayerModeSwitchEntry> switches = querySwitchesWithFilter(filter);
+            for (PlayerModeSwitchEntry switchEntry : switches) {
+                results.add(new LookupEntry(switchEntry));
+            }
+        }
+
         // Sort by timestamp descending (most recent first)
         results.sort(Comparator.comparingLong(LookupEntry::getTimestamp).reversed());
 
@@ -182,6 +196,15 @@ public class DatabaseManager {
 
             Where<PlayerDeathEntry, UUID> where = queryBuilder.where();
             boolean hasCondition = false;
+
+            if (filter.getUserUuid() != null) {
+                if (hasCondition) where.and();
+                where.or(
+                        where.eq("uuid", filter.getUserUuid()),
+                        where.eq("attacker", filter.getUserUuid().toString())
+                );
+                hasCondition = true;
+            }
 
             if (filter.getPlayerUuid() != null) {
                 if (hasCondition) where.and();
@@ -249,6 +272,15 @@ public class DatabaseManager {
             Where<PlayerDamageEntry, UUID> where = queryBuilder.where();
             boolean hasCondition = false;
 
+            if (filter.getUserUuid() != null) {
+                if (hasCondition) where.and();
+                where.or(
+                        where.eq("uuid", filter.getUserUuid()),
+                        where.eq("attacker", filter.getUserUuid().toString())
+                );
+                hasCondition = true;
+            }
+
             if (filter.getPlayerUuid() != null) {
                 if (hasCondition) where.and();
                 where.eq("uuid", filter.getPlayerUuid());
@@ -293,6 +325,51 @@ public class DatabaseManager {
 
             if (!hasCondition) {
                 return playerDamageDao.queryBuilder()
+                        .orderBy("timestamp", false)
+                        .query();
+            }
+
+            return queryBuilder.query();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    private List<PlayerModeSwitchEntry> querySwitchesWithFilter(LookupFilter filter) {
+        try {
+            QueryBuilder<PlayerModeSwitchEntry, UUID> queryBuilder = playerModeSwitchDao.queryBuilder();
+            queryBuilder.orderBy("timestamp", false);
+
+            Where<PlayerModeSwitchEntry, UUID> where = queryBuilder.where();
+            boolean hasCondition = false;
+
+            if (filter.getUserUuid() != null) {
+                if (hasCondition) where.and();
+                where.eq("uuid", filter.getUserUuid());
+                hasCondition = true;
+            }
+
+            if (filter.getPlayerUuid() != null) {
+                if (hasCondition) where.and();
+                where.eq("uuid", filter.getPlayerUuid());
+                hasCondition = true;
+            }
+
+            if (filter.getTimeThreshold() != null) {
+                if (hasCondition) where.and();
+                where.ge("timestamp", filter.getTimeThreshold());
+                hasCondition = true;
+            }
+
+            if (filter.getTimeUpperBound() != null) {
+                if (hasCondition) where.and();
+                where.le("timestamp", filter.getTimeUpperBound());
+                hasCondition = true;
+            }
+
+            if (!hasCondition) {
+                return playerModeSwitchDao.queryBuilder()
                         .orderBy("timestamp", false)
                         .query();
             }

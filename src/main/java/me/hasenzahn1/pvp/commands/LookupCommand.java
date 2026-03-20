@@ -104,7 +104,7 @@ public class LookupCommand implements CommandExecutor, TabCompleter {
         String prefix = currentArg.substring(0, colonIndex + 1);
 
         return switch (resolvedKey) {
-            case "user" -> Bukkit.getOnlinePlayers().stream()
+            case "user", "victim" -> Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(name -> name.toLowerCase().startsWith(value.toLowerCase()))
                     .map(name -> prefix + name)
@@ -135,7 +135,7 @@ public class LookupCommand implements CommandExecutor, TabCompleter {
                     .filter(m -> m.startsWith(value.toLowerCase()))
                     .map(m -> prefix + m)
                     .toList();
-            case "type" -> Stream.of("death", "damage")
+            case "type" -> Stream.of("death", "damage", "switch")
                     .filter(t -> t.startsWith(value.toLowerCase()))
                     .map(t -> prefix + t)
                     .toList();

@@ -54,7 +54,7 @@ lang:
       alreadyOffOther: "&7Peaceful mode for &e%player%&7 is already &cdisabled&7."
       onByOther: "&7Peaceful mode was &aenabled&7 by &e%from%&7."
       offByOther: "&7Peaceful mode was &cdisabled&7 by &e%from%&7."
-      cooldown: "&cYou can't enable Peaceful mode while in PvP cooldown."
+      cooldown: "&cYou can't enable Peaceful mode while in PvP cooldown. Remaining: %minutes%m %seconds%s"
       restricted: "&cYou can't disable the peaceful mode"
 
     lookup:
@@ -69,6 +69,7 @@ lang:
           damageLine:
             normal: "%timestamp% &6⚔ &e%defender%&7 was hit by &e%attacker%&7 %pos% %info%"
             critical: "%timestamp% &6⚔ &e%defender%&7 was &6hit &7by &e%attacker%&7 %pos% %info%"
+          switchLine: "%timestamp% &6⇔ %player%&7 switched mode to %mode%"
 
           timestamp: "&8[&7dd.MM HH:mm&8]"
           pos: "&e[Pos]"
@@ -81,7 +82,9 @@ lang:
 
           mode:
             peaceful: "&a"
+            peacefulString: "&aPeaceful"
             violent: "&c"
+            violentString: "&cPvP"
             non: "&7"
 
         page:
@@ -143,3 +146,8 @@ lang:
       defender:
         isPeaceful: "&cYou died while in &aPeaceful&c mode. Report &e%attacker%&c if this was unfair."
         isNotPeaceful: "&cYou were killed by a player in &aPeaceful&c mode. You can report &e%attacker%&c."
+
+  runnables:
+    cooldownFinished: "&aThe pvp cooldown has run out."
+    raycastPeacefulEnabled: "&7%player%: &aPeaceful"
+    raycastPvPEnabled: "&7%player%: &cPvp enabled"

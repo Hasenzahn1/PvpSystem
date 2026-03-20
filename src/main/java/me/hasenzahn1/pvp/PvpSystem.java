@@ -10,10 +10,13 @@ import me.hasenzahn1.pvp.listeners.DamageLogListener;
 import me.hasenzahn1.pvp.listeners.InventoryListener;
 import me.hasenzahn1.pvp.menu.MenuButton;
 import me.hasenzahn1.pvp.papi.PvpPlaceholderExtension;
+import me.hasenzahn1.pvp.runnables.CountdownFinishedRunnable;
+import me.hasenzahn1.pvp.runnables.RaycastModeRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -37,6 +40,9 @@ public final class PvpSystem extends JavaPlugin {
     private ActionTriggerManager actionTriggerManager;
 
     private double damageThreshold;
+
+    private BukkitTask countdownFinishedRunnable;
+    private BukkitTask raycastModeRunnable;
 
     @Override
     public void onEnable() {
@@ -81,6 +87,9 @@ public final class PvpSystem extends JavaPlugin {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new PvpPlaceholderExtension().register();
         }
+
+        countdownFinishedRunnable = new CountdownFinishedRunnable().runTaskTimer(this, 0, 20);
+        raycastModeRunnable = new RaycastModeRunnable().runTaskTimer(this, 0, 10);
     }
 
     public void parseMenuButton() {
@@ -115,6 +124,9 @@ public final class PvpSystem extends JavaPlugin {
     @Override
     public void onDisable() {
         databaseManager.disconnect();
+
+        countdownFinishedRunnable.cancel();
+        raycastModeRunnable.cancel();
     }
 
     public DatabaseManager getDatabase() {
