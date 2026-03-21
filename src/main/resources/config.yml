@@ -55,7 +55,7 @@ lang:
       onByOther: "&7Peaceful mode was &aenabled&7 by &e%from%&7."
       offByOther: "&7Peaceful mode was &cdisabled&7 by &e%from%&7."
       cooldown: "&cYou can't enable Peaceful mode while in PvP cooldown. Remaining: %minutes%m %seconds%s"
-      restricted: "&cYou can't disable the peaceful mode"
+      restricted: "&cYou are not allowed to disable the peaceful mode"
 
     lookup:
       filterError: "&cError parsing filter: &e%error%"
@@ -70,13 +70,14 @@ lang:
             normal: "%timestamp% &6⚔ &e%defender%&7 was hit by &e%attacker%&7 %pos% %info%"
             critical: "%timestamp% &6⚔ &e%defender%&7 was &6hit &7by &e%attacker%&7 %pos% %info%"
           switchLine: "%timestamp% &6⇔ %player%&7 switched mode to %mode%"
+          footer: ""
 
           timestamp: "&8[&7dd.MM HH:mm&8]"
           pos: "&e[Pos]"
           posHover: "&eClick&7 to teleport.\n&8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)"
           info: "&b[Info]"
-          damageInfoHover: "&eDamage Details:\n&7Time: &f%timestamp%\n&7Victim: &e%defender% &7(&a%defenderHealth%❤&7)\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Cause: &f%cause%\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Damage: &c%damage%\n&7Original: &c%originalDamage%\n&7Trigger: &e%triggerKey%\n\n&8Click for actions."
-          deathInfoHover: "&eDeath Details:\n&7Time: &f%timestamp%\n&7Victim: &e%defender%\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Cause: &f%cause%\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Levels lost: &a%levels%\n&7Items in inv: &e%itemsInInv%\n&7Trigger: &e%triggerKey%\n\n&8Click for actions."
+          damageInfoHover: "&eDamage Details:\n&7Time: &f%timestamp%\n&7Victim: &e%defender% &7(&a%defenderHealth%❤&7)\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Cause: &f%cause%\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Damage: &c%damage%\n&7Original: &c%originalDamage%\n&7Trigger: &e%triggerKey%\n\n&7Weapon: \n%weaponInfo%\n\n&8Click for actions..."
+          deathInfoHover: "&eDeath Details:\n&7Time: &f%timestamp%\n&7Victim: &e%defender%\n&7Attacker: &e%attacker% &7(&a%attackerHealth%❤&7)\n&7Cause: &f%cause%\n&7Location: &8%world% &7(&e%x%&7, &e%y%&7, &e%z%&7)\n&7Levels lost: &a%levels%\n&7Items in inv: &e%itemsInInv%\n&7Trigger: &e%triggerKey%\n\n&7Weapon: \n%weaponInfo%\n\n&8Click for actions..."
           teleportSuccess: "&aTeleported&7. &eClick&7 to return to survival."
           teleportHover: "&eClick&7 to return to survival."
 

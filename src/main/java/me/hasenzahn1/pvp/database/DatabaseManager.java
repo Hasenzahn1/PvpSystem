@@ -56,6 +56,9 @@ public class DatabaseManager {
     private void migrateDatabase() {
         alterTableAddColumn(playerStateDao, "forcePeaceful", "BOOLEAN DEFAULT false");
         alterTableAddColumn(playerStateDao, "disablePVP", "BOOLEAN DEFAULT false");
+
+        alterTableAddColumn(playerDeathDao, "attackItem", "TEXT DEFAULT \"\"");
+        alterTableAddColumn(playerDamageDao, "attackItem", "TEXT DEFAULT \"\"");
     }
 
     private void alterTableAddColumn(Dao<?, UUID> tableClass, String column, String definition) {

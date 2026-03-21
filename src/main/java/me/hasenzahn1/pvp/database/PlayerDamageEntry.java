@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -63,6 +64,9 @@ public class PlayerDamageEntry {
     @DatabaseField
     private String triggerKey;
 
+    @DatabaseField
+    public String attackItem;
+
     public PlayerDamageEntry() {}
 
     public PlayerDamageEntry(EntityDamageEvent event, double originalDamage) {
@@ -91,10 +95,16 @@ public class PlayerDamageEntry {
             PlayerStateEntry attackerState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(attackingEntity.getUniqueId(), null);
             if(attackerState == null) this.attackerMode = -1;
             else this.attackerMode = attackerState.state ? 1 : 0;
+
+            System.out.println(((Player) attackingEntity).getInventory().getItemInMainHand());
+            //Load Attacking Item
+            attackItem = Serializer.itemStackArrayToBase64(new ItemStack[]{((Player) attackingEntity).getInventory().getItemInMainHand()});
+
         }
 
         //Gather trigger key
         triggerKey = PvpSystem.getInstance().getActionTriggerManager().getActionTriggerKey(Bukkit.getPlayer(uuid), attackingEntity);
+
     }
 
     public void create(){
@@ -172,5 +182,9 @@ public class PlayerDamageEntry {
 
     public boolean isCritical(){
         return defenderHealth <= PvpSystem.getInstance().getDamageThreshold();
+    }
+
+    public String getAttackItem() {
+        return attackItem;
     }
 }

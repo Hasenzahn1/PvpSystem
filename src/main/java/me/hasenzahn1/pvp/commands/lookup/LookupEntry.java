@@ -5,14 +5,18 @@ import me.hasenzahn1.pvp.database.PlayerDamageEntry;
 import me.hasenzahn1.pvp.database.PlayerDeathEntry;
 import me.hasenzahn1.pvp.database.PlayerModeSwitchEntry;
 import me.hasenzahn1.pvp.database.Serializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.UUID;
 
 public class LookupEntry {
@@ -129,6 +133,14 @@ public class LookupEntry {
         return isDeath ? playerDeathEntry.getTriggerKey() : playerDamageEntry.getTriggerKey();
     }
 
+    public ItemStack getAttackItem(){
+        if(isSwitch) return null;
+        String key = isDeath ? playerDeathEntry.getAttackItem() : playerDamageEntry.getAttackItem();
+        if(key == null || key.isEmpty()) return null;
+
+        return Serializer.base64ToItemStackArray(key)[0];
+    }
+
     public int getItemsInInv(){
         if(isDamage()) return 0;
 
@@ -211,6 +223,38 @@ public class LookupEntry {
         };
     }
 
+    public static String getMaterialName(Material material) {
+        if (material == null) return "Unknown";
+
+        String name = material.name().toLowerCase().replace("_", " ");
+
+        String[] words = name.split(" ");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty() && word.length() > 2) {
+                result.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+
+        return result.toString().trim();
+    }
+
+    private String getWeaponInformation(){
+        ItemStack stack = getAttackItem();
+        if(stack == null) return "";
+        StringBuilder builder = new StringBuilder();
+        builder.append("&b").append(getMaterialName(stack.getType()));
+        if(stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) builder.append(" ").append(LegacyComponentSerializer.legacyAmpersand().serialize(stack.displayName()));
+        if(!stack.getEnchantments().isEmpty()) builder.append(":");
+        for(Map.Entry<Enchantment, Integer> e : stack.getEnchantments().entrySet()){
+            builder.append("\n&7 - ").append(LegacyComponentSerializer.legacyAmpersand().serialize(e.getKey().displayName(e.getValue())));
+        }
+        return builder.toString();
+    }
+
     public Object[] getReplacementParameters(){
         return new Object[] {
                 "uuid", getUuid(),
@@ -228,7 +272,8 @@ public class LookupEntry {
                 "damage", String.format("%.1f", getDamage()),
                 "originalDamage", String.format("%.1f", getOriginalDamage()),
                 "itemsInInv", getItemsInInv(),
-                "triggerKey", String.valueOf(getTriggerKey())
+                "triggerKey", String.valueOf(getTriggerKey()),
+                "weaponInfo", getWeaponInformation()
         };
     }
 }

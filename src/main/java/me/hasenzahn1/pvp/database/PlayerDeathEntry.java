@@ -73,6 +73,9 @@ public class PlayerDeathEntry {
     @DatabaseField
     private String triggerKey;
 
+    @DatabaseField
+    private String attackItem;
+
     public PlayerDeathEntry() {}
 
     public PlayerDeathEntry(PlayerDeathEvent event){
@@ -105,6 +108,9 @@ public class PlayerDeathEntry {
             PlayerStateEntry attackerState = PvpSystem.getInstance().getDatabase().getPlayerStates().getOrDefault(attackingPlayer.getUniqueId(), null);
             if(attackerState == null) this.attackerMode = -1;
             else this.attackerMode = attackerState.state ? 1 : 0;
+
+            //Load Attacking Item
+            attackItem = Serializer.itemStackArrayToBase64(new ItemStack[]{((Player) attackingEntity).getInventory().getItemInMainHand()});
         }
 
         //Gather trigger key
@@ -204,5 +210,9 @@ public class PlayerDeathEntry {
 
     public void setTriggerKey(String triggerKey) {
         this.triggerKey = triggerKey;
+    }
+
+    public String getAttackItem() {
+        return attackItem;
     }
 }
