@@ -70,7 +70,6 @@ lang:
             normal: "%timestamp% &6⚔ &e%defender%&7 was hit by &e%attacker%&7 %pos% %info%"
             critical: "%timestamp% &6⚔ &e%defender%&7 was &6hit &7by &e%attacker%&7 %pos% %info%"
           switchLine: "%timestamp% &6⇔ %player%&7 switched mode to %mode%"
-          footer: ""
 
           timestamp: "&8[&7dd.MM HH:mm&8]"
           pos: "&e[Pos]"
