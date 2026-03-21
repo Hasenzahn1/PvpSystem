@@ -4,16 +4,20 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 ## Features
 
-- Logs all player deaths and damage events with attacker, cause, location, and inventory
+- Logs all player deaths and damage events with attacker, cause, location, inventory, and weapon used
 - Advanced lookup system with combinable filters and tab completion
 - Interactive paginated UI with clickable teleport, info, inventory view, and inventory restore actions
+- Critical hit indicators shown in the lookup UI
 - Per-player death history command
 - Peaceful mode toggle to flag non-PvP players
+- Admin command to force-peaceful or disable PvP for specific players (`/pvpmodify`)
 - Configurable cooldown preventing players from switching to peaceful mode after PvP combat
+- Action bar notification when the PvP cooldown expires
+- Action bar indicator showing a nearby player's mode when you look at them
 - Inventory viewing and restoration from death records
 - Action triggers to automatically run commands on PvP events involving peaceful players
 - Configurable custom menu buttons in the lookup info view
-- PlaceholderAPI support (`%pvpsystem_isPeaceful%`)
+- PlaceholderAPI support (`%pvpsystem_isPeaceful%`, `%pvpsystem_isPvPDisabled%`, `%pvpsystem_isForcePeaceful%`)
 - Fully customizable messages via `config.yml`
 - SQLite database storage
 
@@ -25,11 +29,12 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 ## Commands
 
-| Command         | Description                           | Usage                                 |
-|-----------------|---------------------------------------|---------------------------------------|
-| `/pvplookup`    | Search deaths and damage with filters | `/pvplookup [filters...]`             |
-| `/deathhistory` | View a player's death history         | `/deathhistory <player> [filters...]` |
-| `/peaceful`     | Toggle peaceful mode                  | `/peaceful [player] <on/off>`         |
+| Command         | Description                                         | Usage                                               |
+|-----------------|-----------------------------------------------------|-----------------------------------------------------|
+| `/pvplookup`    | Search deaths and damage with filters               | `/pvplookup [filters...]`                           |
+| `/deathhistory` | View a player's death history                       | `/deathhistory <player> [filters...]`               |
+| `/peaceful`     | Toggle peaceful mode                                | `/peaceful [player] <on/off>`                       |
+| `/pvpmodify`    | Force-peaceful or disable PvP for a player (admin)  | `/pvpmodify <player> <forcepeaceful\|disablepvp>`   |
 
 `/peaceful` can also be used as `/friedlich`.
 
@@ -45,22 +50,24 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 | `pvpsystem.commands.lookup.view`          | View death inventories in the lookup UI              |
 | `pvpsystem.commands.lookup.reset`         | Restore inventories from the lookup UI               |
 | `pvpsystem.commands.lookup.deathhistory`  | Use `/deathhistory`                                  |
+| `pvpsystem.commands.pvpmodify`            | Use `/pvpmodify`                                     |
 
 ## Filter Reference
 
 Filters are passed as arguments in `key:value` format. Each filter has a short and long name. Multiple filters can be combined in any order.
 
-| Short  | Long        | Description                      | Values                                            |
-|--------|-------------|----------------------------------|---------------------------------------------------|
-| `u:`   | `user:`     | Filter by victim player          | Player name                                       |
-| `a:`   | `attacker:` | Filter by attacker               | Player name or `#entity` (see below)              |
-| `c:`   | `cause:`    | Filter by damage cause           | Bukkit DamageCause (e.g. `entity_attack`, `fall`) |
-| `w:`   | `world:`    | Filter by world                  | World name                                        |
-| `r:`   | `radius:`   | Filter by radius around you      | `1`-`100` (blocks)                                |
-| `m:`   | `mode:`     | Filter by defender mode          | `pvp` or `peaceful`                               |
-| `ty:`  | `type:`     | Filter by entry type             | `death` or `damage`                               |
-| `t:`   | `time:`     | Time window size                 | Duration (e.g. `30m`, `2h`, `1d2h30m`)            |
-| `af:`  | `after:`    | Offset time window into the past | Duration (e.g. `1h`, `7d`)                        |
+| Short  | Long        | Description                              | Values                                            |
+|--------|-------------|------------------------------------------|---------------------------------------------------|
+| `u:`   | `user:`     | Filter by player as attacker or defender | Player name                                       |
+| `v:`   | `victim:`   | Filter by victim/defender only           | Player name                                       |
+| `a:`   | `attacker:` | Filter by attacker                       | Player name or `#entity` (see below)              |
+| `c:`   | `cause:`    | Filter by damage cause                   | Bukkit DamageCause (e.g. `entity_attack`, `fall`) |
+| `w:`   | `world:`    | Filter by world                          | World name                                        |
+| `r:`   | `radius:`   | Filter by radius around you              | `1`-`100` (blocks)                                |
+| `m:`   | `mode:`     | Filter by defender mode                  | `pvp` or `peaceful`                               |
+| `ty:`  | `type:`     | Filter by entry type                     | `death` or `damage`                               |
+| `t:`   | `time:`     | Time window size                         | Duration (e.g. `30m`, `2h`, `1d2h30m`)            |
+| `af:`  | `after:`    | Offset time window into the past         | Duration (e.g. `1h`, `7d`)                        |
 
 ### Time Filtering
 
@@ -170,6 +177,7 @@ The following placeholders can be used in action trigger commands, custom menu b
 | `%originalDamage%` | Original damage before reduction (damage entries only)               |
 | `%itemsInInv%`     | Number of item stacks in the victim's inventory (death entries only) |
 | `%triggerKey%`     | Unique action trigger key for the combat pair (empty if no trigger)  |
+| `%weaponInfo%`     | The item the attacker was holding when the event occurred            |
 
 ## Peaceful Mode Cooldown
 
@@ -179,14 +187,32 @@ After a player engages in PvP combat, they are prevented from switching to peace
 - The cooldown timer starts on PvP actions (dealing or receiving PvP damage).
 - Configurable via `peacefulCommandCooldownAfterPvp` in `config.yml` (value in milliseconds, default `60000` = 60 seconds).
 - When a player tries to enable peaceful mode while the cooldown is active, they receive a configurable denial message (`commands.peaceful.cooldown` in `config.yml`).
+- When the cooldown expires, the player receives an action bar notification (`runnables.cooldownFinished` in `config.yml`).
+
+## Player Mode Indicator
+
+When a player looks at another player within 10 blocks, they receive an action bar message showing the target's current mode (peaceful or PvP). The messages are configurable via `runnables.raycastPeacefulEnabled` and `runnables.raycastPvPEnabled` in `config.yml`.
+
+## /pvpmodify Command
+
+The `/pvpmodify` command allows admins to set special mode flags on players that cannot be changed by the players themselves:
+
+| Subcommand       | Description                                                                                      |
+|------------------|--------------------------------------------------------------------------------------------------|
+| `forcepeaceful`  | Toggles forced peaceful mode — the player is treated as peaceful regardless of their own setting |
+| `disablepvp`     | Toggles PvP disabled — the player is set to peaceful and cannot take or deal PvP damage          |
+
+These flags are stored in the database and persist across restarts. The affected player receives a configurable notification message when the flag is changed.
 
 ## PlaceholderAPI
 
 If [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) is installed, the following placeholder is available:
 
-| Placeholder                | Description                                                         |
-|----------------------------|---------------------------------------------------------------------|
-| `%pvpsystem_isPeaceful%`   | Returns `true` if the player is in peaceful mode, `false` otherwise |
+| Placeholder                    | Description                                                                      |
+|--------------------------------|----------------------------------------------------------------------------------|
+| `%pvpsystem_isPeaceful%`       | Returns `true` if the player is in peaceful mode, `false` otherwise              |
+| `%pvpsystem_isPvPDisabled%`    | Returns `true` if the player has PvP disabled (set by admin), `false` otherwise  |
+| `%pvpsystem_isForcePeaceful%`  | Returns `true` if the player is force-peaceful (set by admin), `false` otherwise |
 
 ## Configuration
 
