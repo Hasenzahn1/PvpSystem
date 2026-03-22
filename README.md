@@ -197,10 +197,11 @@ When a player looks at another player within 10 blocks, they receive an action b
 
 The `/pvpmodify` command allows admins to set special mode flags on players that cannot be changed by the players themselves:
 
-| Subcommand       | Description                                                                                      |
-|------------------|--------------------------------------------------------------------------------------------------|
-| `forcepeaceful`  | Toggles forced peaceful mode — the player is treated as peaceful regardless of their own setting |
-| `disablepvp`     | Toggles PvP disabled — the player is set to peaceful and cannot take or deal PvP damage          |
+| Subcommand      | Description                                                                                      |
+|-----------------|--------------------------------------------------------------------------------------------------|
+| `forcepeaceful` | Toggles forced peaceful mode — the player is treated as peaceful regardless of their own setting |
+| `disablepvp`    | Toggles PvP disabled — the player is set to peaceful and cannot take or deal PvP damage          |
+| `info`          | Show information about the pvp status of the player                                              |
 
 These flags are stored in the database and persist across restarts. The affected player receives a configurable notification message when the flag is changed.
 

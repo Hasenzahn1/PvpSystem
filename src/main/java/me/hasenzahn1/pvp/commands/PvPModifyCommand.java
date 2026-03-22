@@ -1,6 +1,7 @@
 package me.hasenzahn1.pvp.commands;
 
 import me.hasenzahn1.pvp.PvpSystem;
+import me.hasenzahn1.pvp.database.PlayerModeSwitchEntry;
 import me.hasenzahn1.pvp.database.PlayerStateEntry;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -27,7 +28,7 @@ public class PvPModifyCommand implements CommandExecutor, TabExecutor {
         }
 
         if(args.length != 2){
-            sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.invalidCommand", "command", "/" + label + " <selector> <disablepvp/forcepeaceful>")));
+            sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.invalidCommand", "command", "/" + label + " <selector> <disablepvp/forcepeaceful/info>")));
             return true;
         }
 
@@ -45,8 +46,11 @@ public class PvPModifyCommand implements CommandExecutor, TabExecutor {
             case "forcepeaceful" -> {
                 toggleForcePeaceful(sender, state, player);
             }
+            case "info" -> {
+                sendInfo(sender, state);
+            }
             default -> {
-                sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.invalidCommand", "command", "/" + label + " <selector> <disablepvp/forcepeaceful>")));
+                sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.invalidCommand", "command", "/" + label + " <selector> <disablepvp/forcepeaceful/info>")));
                 return true;
             }
         }
@@ -57,8 +61,19 @@ public class PvPModifyCommand implements CommandExecutor, TabExecutor {
         return true;
     }
 
+    private void sendInfo(CommandSender sender, PlayerStateEntry state) {
+        String mode = state.state ? PvpSystem.getLang("commands.lookup.ui.entry.mode.peacefulString") : PvpSystem.getLang("commands.lookup.ui.entry.mode.violentString");
+        sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.pvpModify.info.message",
+                "player", Bukkit.getOfflinePlayer(state.uuid).getName(),
+                "mode", mode,
+                "forcePeaceful", state.forcePeaceful,
+                "disablePvp", state.disablePVP)));
+    }
+
     private void toggleDisablePvp(CommandSender sender, PlayerStateEntry state, OfflinePlayer receiver) {
         state.disablePVP = !state.disablePVP;
+        PlayerModeSwitchEntry entry = new PlayerModeSwitchEntry(receiver.getUniqueId(), true);
+        entry.create();
         state.state = true;
 
         if(state.disablePVP) {
@@ -78,7 +93,10 @@ public class PvPModifyCommand implements CommandExecutor, TabExecutor {
 
     private void toggleForcePeaceful(CommandSender sender, PlayerStateEntry state, OfflinePlayer receiver) {
         state.forcePeaceful = !state.forcePeaceful;
+        PlayerModeSwitchEntry entry = new PlayerModeSwitchEntry(receiver.getUniqueId(), true);
+        entry.create();
         state.state = true;
+
 
         if(state.forcePeaceful) {
             sender.sendMessage(Component.text(PvpSystem.getPrefixedLang("commands.pvpModify.forcePeaceful.setEnabled", "player", receiver.getName())));
@@ -101,7 +119,7 @@ public class PvPModifyCommand implements CommandExecutor, TabExecutor {
             return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(f -> f.toLowerCase().startsWith(args[0].toLowerCase())).toList();
         }
         if(args.length == 2){
-            return Stream.of("forcePeaceful", "disablepvp").filter(f -> f.toLowerCase().startsWith(args[1].toLowerCase())).toList();
+            return Stream.of("forcePeaceful", "disablePvP", "info").filter(f -> f.toLowerCase().startsWith(args[1].toLowerCase())).toList();
         }
         return List.of();
     }

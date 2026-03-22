@@ -244,7 +244,8 @@ public class LookupEntry {
 
     private String getWeaponInformation(){
         ItemStack stack = getAttackItem();
-        if(stack == null) return "";
+        if(stack == null) return "&b-";
+        if(stack.getType() == Material.AIR) return "&b-";
         StringBuilder builder = new StringBuilder();
         builder.append("&b").append(getMaterialName(stack.getType()));
         if(stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) builder.append(" ").append(LegacyComponentSerializer.legacyAmpersand().serialize(stack.displayName()));

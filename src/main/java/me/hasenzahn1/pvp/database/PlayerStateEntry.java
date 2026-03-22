@@ -47,6 +47,7 @@ public class PlayerStateEntry {
     }
 
     public static PlayerStateEntry queryForIdWithoutCreation(UUID uuid){
+        PvpSystem.getInstance().getDatabase().updateAllPlayerStates();
         try{
             return PvpSystem.getInstance().getDatabase().getPlayerStateDao().queryForId(uuid);
         } catch (SQLException e) {

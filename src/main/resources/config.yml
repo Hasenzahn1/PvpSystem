@@ -108,17 +108,19 @@ lang:
 
     pvpModify:
       forcePeaceful:
-        setEnabled: "&aEnabled force peaceful mode for the player &6%player%"
+        setEnabled: "&aEnabled force peaceful mode for the player &6%player%&7. The player has been set to &apeaceful &7mode"
         setDisabled: "&eDisabled force peaceful mode for the player &6%player%"
         enabled: "&7Force peaceful mode has been &eenabled &7for you"
         disabled: "&7Force peaceful mode has been &cdisabled &7for you"
 
       disablePvp:
-        setEnabled: "&cDisabled &7all pvp actions for the player &6%player%"
-        setDisabled: "&eReenabled &7all pvp actions for the player &6%player%"
-        enabled: "&7All pvp actions have been &cdisabled &7for you"
-        disabled: "&7All pvp actions have been &ereenabled &7for you"
+        setEnabled: "&cDisabled &7all PvP actions for the player &6%player%&7. The player has been set to &apeaceful &7mode"
+        setDisabled: "&eReenabled &7all PvP actions for the player &6%player%"
+        enabled: "&7All PvP actions have been &cdisabled &7for you"
+        disabled: "&7All PvP actions have been &ereenabled &7for you"
 
+      info:
+        message: "&6%player%: \n &7- Mode: %mode%\n &7- Force Peaceful: &6%forcePeaceful%\n &7- Disable PvP: &6%disablePvp%"
 
   join:
     message:
@@ -148,6 +150,6 @@ lang:
         isNotPeaceful: "&cYou were killed by a player in &aPeaceful&c mode. You can report &e%attacker%&c."
 
   runnables:
-    cooldownFinished: "&aThe pvp cooldown has run out."
+    cooldownFinished: "&aThe PvP cooldown has run out."
     raycastPeacefulEnabled: "&7%player%: &aPeaceful"
-    raycastPvPEnabled: "&7%player%: &cPvp enabled"
+    raycastPvpEnabled: "&7%player%: &cPvP enabled"

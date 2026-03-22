@@ -25,7 +25,7 @@ public class RaycastModeRunnable extends BukkitRunnable {
             if(entry.state){
                 p.sendActionBar(Component.text(PvpSystem.getLang("runnables.raycastPeacefulEnabled", "player", player.getName())));
             }else{
-                p.sendActionBar(Component.text(PvpSystem.getLang("runnables.raycastPvPEnabled", "player", player.getName())));
+                p.sendActionBar(Component.text(PvpSystem.getLang("runnables.raycastPvpEnabled", "player", player.getName())));
             }
         }
     }

@@ -74,9 +74,7 @@ public class DatabaseManager {
     }
 
     public void disconnect(){
-        for(PlayerStateEntry state : playerStates.values()){
-            state.update();
-        }
+        updateAllPlayerStates();
 
         flushAllDamageEntriesToDatabase();
 
@@ -84,6 +82,12 @@ public class DatabaseManager {
 
         if(connectionSource != null) {
             connectionSource.closeQuietly();
+        }
+    }
+
+    public void updateAllPlayerStates(){
+        for(PlayerStateEntry state : playerStates.values()){
+            state.update();
         }
     }
 
