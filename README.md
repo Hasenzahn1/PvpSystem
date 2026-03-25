@@ -29,12 +29,12 @@ A Paper plugin for tracking and managing PvP and PvE combat events. Logs all dea
 
 ## Commands
 
-| Command         | Description                                         | Usage                                               |
-|-----------------|-----------------------------------------------------|-----------------------------------------------------|
-| `/pvplookup`    | Search deaths and damage with filters               | `/pvplookup [filters...]`                           |
-| `/deathhistory` | View a player's death history                       | `/deathhistory <player> [filters...]`               |
-| `/peaceful`     | Toggle peaceful mode                                | `/peaceful [player] <on/off>`                       |
-| `/pvpmodify`    | Force-peaceful or disable PvP for a player (admin)  | `/pvpmodify <player> <forcepeaceful\|disablepvp>`   |
+| Command         | Description                                         | Usage                                                   |
+|-----------------|-----------------------------------------------------|---------------------------------------------------------|
+| `/pvplookup`    | Search deaths and damage with filters               | `/pvplookup [filters...]`                               |
+| `/deathhistory` | View a player's death history                       | `/deathhistory <player> [filters...]`                   |
+| `/peaceful`     | Toggle peaceful mode                                | `/peaceful [player] <on/off>`                           |
+| `/pvpmodify`    | Force-peaceful or disable PvP for a player (admin)  | `/pvpmodify <player> <forcepeaceful\|disablepvp\|info>` |
 
 `/peaceful` can also be used as `/friedlich`.
 
