@@ -41,6 +41,7 @@ public class DamageListener implements Listener {
         lastDamageForPlayer.put(victim, event.getFinalDamage());
 
         Entity attackingEntity = EventUtils.getAttackingEntity(event);
+        if(attackingEntity == victim) return; //Ignore Own damage sources
         if(!isPlayer(attackingEntity)) return; // Only PvP should be restricted
 
         PlayerStateEntry victimEntry = PvpSystem.getInstance().getDatabase().getPlayerStates().get(victim.getUniqueId());
