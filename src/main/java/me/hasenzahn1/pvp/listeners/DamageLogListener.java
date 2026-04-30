@@ -39,6 +39,7 @@ public class DamageLogListener implements Listener {
 
         //Ignore damage above damage Threshold
         if(victim.getHealth() - event.getFinalDamage() >= PvpSystem.getInstance().getDamageThreshold()) return;
+        if(attackingEntity == victim) return; //Ignore Own damage sources
 
         //Send for attacker
         if(attackerMode) attacker.sendMessage(Component.text(PvpSystem.getPrefixedLang("damage.message.attacker.isPeaceful", "attacker", attacker.getName(), "defender", victim.getName())));
