@@ -96,7 +96,6 @@ public class PlayerDamageEntry {
             if(attackerState == null) this.attackerMode = -1;
             else this.attackerMode = attackerState.state ? 1 : 0;
 
-            System.out.println(((Player) attackingEntity).getInventory().getItemInMainHand());
             //Load Attacking Item
             attackItem = Serializer.itemStackArrayToBase64(new ItemStack[]{((Player) attackingEntity).getInventory().getItemInMainHand()});
 

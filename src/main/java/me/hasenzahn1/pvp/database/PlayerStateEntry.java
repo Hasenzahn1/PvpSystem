@@ -34,7 +34,6 @@ public class PlayerStateEntry {
     public static PlayerStateEntry queryForId(UUID uuid){
         try{
             PlayerStateEntry pState = PvpSystem.getInstance().getDatabase().getPlayerStateDao().queryForId(uuid);
-            System.out.println("State: " + pState);
             if(pState == null) {
                 pState = new PlayerStateEntry(uuid, true, false, false);
                 PvpSystem.getInstance().getDatabase().getPlayerStateDao().create(pState);

@@ -13,13 +13,10 @@ public class ConnectionListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
-        System.out.println(event);
         PlayerStateEntry playerStateEntry = PlayerStateEntry.queryForId(event.getPlayer().getUniqueId());
-        System.out.println(playerStateEntry);
         if(playerStateEntry == null) return;
         if(playerStateEntry.forcePeaceful || playerStateEntry.disablePVP) playerStateEntry.state = true;
         PvpSystem.getInstance().getDatabase().getPlayerStates().put(event.getPlayer().getUniqueId(), playerStateEntry);
-        System.out.println(PvpSystem.getInstance().getDatabase().getPlayerStates());
         int messageDuration = PvpSystem.getInstance().getConfig().getInt("joinMessageDuration", 20);
         String message = "";
         if(playerStateEntry.state) message = PvpSystem.getLang("join.message.peaceful");
